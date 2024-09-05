@@ -1,0 +1,157 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Thesis Template - Tilburg Science Hub
+%% Andrea Domenico Antonacci, a.d.antonacci@tilburguniversity.edu
+%% Last update: April 2021
+%% Use pdflatex
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% INSTRUCTIONS:
+%% Use this file to define the document structure, the preamble, the abstract, and the acknowledgements.
+%% Use the section files to write your content and import them here.
+%% This template is meant to run on pdflatex and with fonts available via packages.
+%% Use XeLaTeX if you want to use your own custom fonts.
+
+\RequirePackage{amsmath} % Load amsmath first
+\documentclass[a4paper,12pt]{article}
+% Set your margins here
+\usepackage[margin=1in]{geometry}
+% Set your language
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+% Define fonts via packages
+\usepackage{mathpazo} % Use Palatino font
+% \usepackage{gfsdidot} % Or use Didot font
+% Set global line spacing
+\renewcommand{\baselinestretch}{1.5}
+% Allow multi-column environments
+\usepackage{multicol}
+\setlength\columnsep{40pt}
+% Formulas and math
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{empheq}
+\usepackage{units} % Allow nice in-line, diagonal fractions
+% Define bibliography, update according to your needs
+\usepackage[
+    backend=biber,
+    style=numeric,
+  ]{biblatex}
+ \addbibresource{bib.bib}
+% Allow hyperref with click-through sections and references
+\usepackage[unicode=true,pdfusetitle,bookmarks=true,bookmarksnumbered=true,bookmarksopen=true,bookmarksopenlevel=1,breaklinks=false,pdfborder={0 0 0},pdfborderstyle={},backref=false]{hyperref}
+% Replace "Placeholder Name" in pdfauthor with your real name and update the link colors to taste
+\hypersetup{pdfpagelayout=OneColumn, pdfnewwindow=true, pdfstartview=XYZ, plainpages=false,pdfauthor={Placeholder Name},colorlinks=true,linkcolor=ForestGreen,citecolor=ForestGreen}
+% Allow fancy headers
+\usepackage{fancyhdr}
+\fancypagestyle{SectionFirstPage}{\fancyhead{}\renewcommand{\headrulewidth}{0pt}} % Use this pagestyle to hide headers on the first page of sections
+% Misc packages
+\usepackage{lipsum} % For prototyping
+\usepackage{listings} % To highlight code
+\usepackage{algorithm} % For algorithms
+\usepackage{setspace} % To set line spacing locally
+\usepackage{graphicx} % Allow figures
+\graphicspath{ {images/} } % Specify the path for images
+\usepackage[dvipsnames]{xcolor} % Enable more colors in text
+\usepackage{microtype} % Improve justification
+\usepackage{url} % Line-breaking urls
+\usepackage{pdflscape} % Allow pages in landscape mode
+\usepackage{multirow} % Allow multirow in tables
+\usepackage[labelfont=bf]{caption} % Set caption distances from tables and figures
+\usepackage{subcaption} % For subfigures, remove if unused
+\captionsetup[table]{skip=10pt, position=top}
+\captionsetup[figure]{belowskip=10pt, skip=5pt, position=top}
+\usepackage[nottoc]{tocbibind} % Add bibliography to Table of Content
+\usepackage{makecell} % Allow to break lines inside a table cell
+\usepackage[para]{threeparttable} % For structured and complex tables
+\usepackage{rotating} % To rotate tables
+\usepackage{textcomp} % For symbols
+\usepackage{tikz} % For graphs and graphics
+\usetikzlibrary{shapes.geometric, shapes.misc, arrows, positioning}
+\def\checkmark{\tikz\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;} % Define a checkmark (tick), used in section 2
+\usepackage{varioref} % Intelligent references with pageref automatically added
+\setlength{\headheight}{14.49998pt}
+\counterwithin*{equation}{section} % Reset numbering for each chapter
+\counterwithin*{equation}{subsection}
+\newenvironment{system}%
+{\left\lbrace\begin{array}{@{}l@{}}}%
+{\end{array}\right.}
+% Define title page
+\usepackage{titling}
+\renewcommand\maketitlehooka{\null\mbox{}\vfill} % To vertically center it
+\renewcommand\maketitlehookd{\vfill\null}
+\title{
+    Belote AI \\
+        \large Project in Artificial Intelligence and Decision Support \\ American University of Armenia \\
+}
+\author{Grigor Hovhannisyan
+\and
+Aram Abrahamyan
+\and
+Meruzhan Khachatryan
+}
+% \date{January 2000} % Uncomment for custom date
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% CONTENT BELOW
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+
+
+% Title page
+{ % Use curly brackets to create a group and assign properties locally
+\setstretch{1.0}
+\maketitle\thispagestyle{empty}
+\vspace{1cm}{}
+}
+\vspace{1cm}
+
+
+% Table of Content
+{
+    \newpage
+    \setstretch{1.0}
+    \hypersetup{linkcolor=black} % Links in TOC are black
+    \pagenumbering{roman}
+    \tableofcontents
+}
+
+% Abstract
+\newpage
+\begin{abstract}
+    \addcontentsline{toc}{section}{Abstract}
+    Infectious diseases are a prevalent issue among everyone.
+    The knowledge of its likely path and development can substantially help the government control the disease and hospitals correctly manage resources to accommodate the high number of patients.
+    This is the aim of the SIR model, which this paper aims to explain and provide examples of.
+    The SIR model has many modifications and extensions, some of which we will explore.
+    We will also showcase and explain the analytic solution to the standard SIR model, but unfortunately, many of the modifications do not have an analytical solution; hence, we will approximate them numerically.
+    The main methods to do so will be the Euler and the backward Euler methods, both of which have an error, which we will derive and showcase on graphs.
+    All of the coding is done in Python with examples and explanations, as well as graphs and the explanation of the given graphs.
+    Furthermore, we gathered and plotted graphs from real-world data concerning some famous diseases.
+    We will compare them to the SIR model and determine how accurate it gets over time.
+    Finally, we will draw conclusions and discuss how much of an impact the model can have on the world if used correctly.
+\end{abstract}
+
+% Content
+\newpage
+\pagestyle{fancy} % Initiate headers
+% Define global headers for all the sections
+\lhead{\nouppercase{\rightmark}}
+\rhead{}
+\pagenumbering{arabic}
+% Import sections
+
+
+
+
+% Appendices, remove if unused
+
+% Bibliography
+\newpage
+\thispagestyle{SectionFirstPage} % Hide headers on the first page of the section
+\lhead{References}
+\rhead{}
+\renewcommand\refname{References}
+\printbibliography
+\end{document}
