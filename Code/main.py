@@ -72,7 +72,7 @@ class PlayersManager(GameManager): # Inherits GameManager
             
             
     def update(self): # This is called every frame.
-        if Input.get_key_down('q'): 
+        if Input.get_key_down('q'):
             self.quit() 
             
         if self.game_state == GameState.DEALING.value:
