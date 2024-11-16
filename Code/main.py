@@ -13,8 +13,8 @@ import curses
 curses.initscr()
 curses.curs_set(0)
 
-OUR_FINAL_SCORE = 0
-THEIR_FINAL_SCORE = 0
+OUR_FINAL_SCORE = 3001
+THEIR_FINAL_SCORE = 30000
 
 #The game is written with the state machine design pattern (mostly, hopefully)
 class GameState(Enum):
@@ -82,6 +82,8 @@ class PlayersManager(GameManager): # Inherits GameManager
         self.start_time = time.time()
         
         self.deal_start_time = time.time()
+        self.winner_start_time = time.time()
+        
         
         self.chosen_suit: list[int] = [None] * 5
         self.auction_start_num = 8
@@ -137,6 +139,7 @@ class PlayersManager(GameManager): # Inherits GameManager
                 self.add_object(self.final_window)
                 self.final_timer = time.time()
                 self._GameManager__game_objects.remove(self.speech)
+                self.winner_start_time = time.time()
                 self.game_state = GameState.ENDROUND.value
                 return 
             
@@ -149,12 +152,38 @@ class PlayersManager(GameManager): # Inherits GameManager
         if self.game_state == GameState.ENDROUND.value:
             if time.time() - self.final_timer > 5:
                 self._GameManager__game_objects = []
-                self.setup()
+                flag = False
+                
+                global OUR_FINAL_SCORE
+                global THEIR_FINAL_SCORE
+                
+                if OUR_FINAL_SCORE > 300 and THEIR_FINAL_SCORE > 300:
+                    flag = True
+                    if OUR_FINAL_SCORE > THEIR_FINAL_SCORE:
+                        self.final_window.set_winner(0)
+                    else:
+                        self.final_window.set_winner(1)
+                if OUR_FINAL_SCORE > 300 and THEIR_FINAL_SCORE <= 300:
+                    self.final_window.set_winner(0)
+                    flag = True
+                if THEIR_FINAL_SCORE > 300 and OUR_FINAL_SCORE <= 300:
+                    self.final_window.set_winner(1)
+                    flag = True
+                    
+                if flag:
+                    self.add_object(self.final_window)
+                    if time.time() - self.winner_start_time > 8:
+                        OUR_FINAL_SCORE = 0
+                        THEIR_FINAL_SCORE = 0
+                        self._GameManager__game_objects = []
+                        self.setup()
+                else:
+                    self.setup()
                 return
         
         if self.game_state == GameState.WAITINGFORCARD.value:
             self.clear_card_prompts(self.main_cards)
-            if time.time() - self.deal_start_time > 1:
+            if time.time() - self.deal_start_time > 0:
                 self.game_state = GameState.PLAYINGCARD.value
         
         if self.game_state == GameState.PLAYINGCARD.value:
@@ -404,8 +433,9 @@ class PlayersManager(GameManager): # Inherits GameManager
             if speech.text != "Pass":
                 return
         
-        if self.auction_result == [None, None, None]:
-            #TODO: Deal Again
+        if self.auction_result == [None, None, None, None]:
+            self._GameManager__game_objects = []
+            self.setup()
             return
         
         for speech in self.speech_bubbles:

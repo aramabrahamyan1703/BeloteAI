@@ -14,7 +14,6 @@ class Left_Cards(GameObject):
         self.to_play = False
         self.to_end_hand = False
         self.who_took = 0
-        self.show_card()
         
     def __repr__(self) -> str:
         suits = ["♡", '♤', '♧', '♢']
@@ -123,7 +122,6 @@ class Right_Cards(GameObject):
         self.card = card
         self.to_end_hand = False
         self.who_took = 0
-        self.show_card()
         
     def __repr__(self) -> str:
         suits = ["♡", '♤', '♧', '♢']
@@ -231,7 +229,6 @@ class Top_Cards(GameObject):
         self.card = card
         self.to_end_hand = False
         self.who_took = 0
-        self.show_card()
         
     def __repr__(self) -> str:
         suits = ["♡", '♤', '♧', '♢']
