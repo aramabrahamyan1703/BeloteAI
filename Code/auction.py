@@ -60,7 +60,7 @@ class Speech_Bubble(GameObject):
         
         '''
         Location to put the bubble depending on whose turn it is.
-        Could be written without the if's using some function, but it's fast enough. 
+        Could be written without the if's using some function, but it's good enough. 
         '''
         if turn == 0:
             card_length = 11

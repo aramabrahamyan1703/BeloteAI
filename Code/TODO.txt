@@ -1,0 +1,5 @@
+1) Score Table 
+2) Coinche
+3) Initial Screen 
+4) Dealing (Dealing again after everyone said Pass)
+5) Declarations
