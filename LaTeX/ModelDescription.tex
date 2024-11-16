@@ -81,32 +81,11 @@ the actions Coinchee, Cabot, etc.)
 
 
 \subsection{Minimax Algorithm for the Playing part}
-\hspace{\parindent} Up to the Second phase of the game, which is the playing process.
-In this case, we will use
-the Stochastic Minimax Algorithm, which will work for each trick (each player making one
-move after which it is calculated which side gets the cards). At the beginning of the
-game, there will be a set trump, which will prioritize the moves of the players,
-especially if their bid won. If your bid did not win, and the play starts with you,
-the minimax algorithm will prioritize using high value non-trump cards, however, the
-algorithm should check, if the opponents will either have a higher value card from the
-same suit, or no cards of the corresponding suit. As an example, Let’s imagine that the
-play starts with the AI, the bid belongs to opponents, and it is set to be 11$\spadesuit$.
-The bot has 1 trump card (Q$\spadesuit$), 3$\clubsuit$, 2$\diamondsuit$, and 10$\heartsuit$. The highest
-non-trump card is 10$\heartsuit$. The Minimax algorithm, will check all the branches with
-possible combinations of 8 cards for the opponent, and return possibilities for cases
-when the bot team wins, or when the opponents win. In this case, it would be 2/3 chance
-for the opponents to have the Ace$\heartsuit$, 1/3 chance for the partner to have Ace$\heartsuit$. We add
-to this the probability that one of the opponents does not have any Hearts hence they
-will use the trump. If we approximate, we will calculate the chances of not having any
-of the remaining 6 hearts out of 24 (p=0.25) and calculate the probability using Binomial
-Distribution on 8 cases with 0 successes, returning 0.1 for each player (chance of not
-having a Hearts card). For at least one player to not have any hearts card, we will get
-19% chance for at least one of the opponents not having any Hearts. As a result we would
-get the union of the probabilities and get the 86% chance of losing the H10 by playing it.
-Hence the Stochastic Minimax will play
-the card with 86% chance. Instead of using Binomial Distribution, the algorithm will
-check the possible outcomes of the play, and calculate the proportion, when the H10 is
-lost to opponents, and hence get the probability of success. This process would be done
-for each prioritized card to play, until the best option is picked (Highest success rate).
-If the bot is prone to lose the card nonetheless, then it is chosen to be the least value
-having card on the hand.
+\hspace{\parindent} In the second part of the game one of the available options is stochastic Minimax.
+This algorithm consists of Min, Max and Chance nodes, the problem lies in the chance nodes which have a lot of nodes coming out of them.
+For example consider the first hand in the game when the bot has to make a move. Lets say the bot is a max node.
+The bot can make 8 moves so there are 8 branches coming out of the root. Next we need to have chance nodes coming out of each of the 8 nodes.
+The chance nodes each have $\binom{24}{8}$ nodes since that's how many possible combination of cards the next player can have.
+This by itself already renders the Minimax algorithm not practical since it is not feasible to check that many nodes.
+For example consider the case when \textbf{DESCRIBE THE TEXT HERE}: \\
+\textbf{ADD GRAPHIC HERE}
