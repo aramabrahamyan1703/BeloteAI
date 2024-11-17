@@ -87,5 +87,122 @@ For example consider the first hand in the game when the bot has to make a move.
 The bot can make 8 moves so there are 8 branches coming out of the root. Next we need to have chance nodes coming out of each of the 8 nodes.
 The chance nodes each have $\binom{24}{8}$ nodes since that's how many possible combination of cards the next player can have.
 This by itself already renders the Minimax algorithm not practical since it is not feasible to check that many nodes.
-For example consider the case when \textbf{DESCRIBE THE TEXT HERE}: \\
-\textbf{ADD GRAPHIC HERE}
+For example consider the case when there aer only 2 cards left for each player, and the first two moves for the play are made.
+
+\begin{tikzpicture}
+
+\draw[thick] (0,0) rectangle (10,6);  % Rectangle table dimensions
+
+\draw[thick, draw=black, fill=white] (1.2, 3.5-0.5) rectangle (0, 3.5-0.5-0.8);
+\draw[thick, draw=black, fill=white] (4.2, 3.3) rectangle (3, 2.5);
+\foreach \i in {0,1}
+    \draw[thick, draw=black, fill=white] (10, 3.5-\i*0.5) rectangle (8.8, 3.5-\i*0.5-0.8);
+\foreach \i in {0,1}
+    \draw[thick, draw=black, fill=white] (5 + \i*0.5, 6) rectangle (4.2 + \i*0.5, 5);
+\draw[thick, draw=black, fill=white] (5.1 + 0.5, 0) rectangle (4.2 + 0.5, 1.1);
+\draw[thick, draw=black, fill=white] (5.1 + 0.5, 3.3) rectangle (4.2 + 0.5, 2.1);
+
+\draw[thick] (-1.5, 3) circle(0.9);
+% Right side chair
+\draw[thick] (11.5, 3) circle(0.9);
+% Top side chair
+\draw[thick] (5, 7.5) circle(0.9);
+% Bottom side chair
+\draw[thick] (5, -1.5) circle(0.9);
+
+\node at (-1.5, 3) {Left AI};
+\node at (-1.45, 1.6) {Card - Q $\clubsuit$};
+\node at (11.5, 3) {Right AI};
+\node at (5, 7.5) {Top AI};
+\node at (5, -1.5) {Player};
+\node at (5.2, -3) {First Player, Card - 10$\clubsuit$};
+
+\node [rotate=270] at (3.6, 2.9) {\scriptsize \textcolor{black}{Q $\clubsuit$}};
+\node at (5.15, 2.7) { \scriptsize \textcolor{black}{10 $\clubsuit$}};
+\node at (5.1, 5.45) {\scriptsize \textcolor{black}{10 $\spadesuit$}};
+\node at (4.45, 5.45) {\scriptsize \textcolor{red}{K$\diamondsuit$}};
+
+
+\end{tikzpicture}
+
+The algorithm calculated that the remaining cards in the game (besides its own and the ones played are:
+A$\spadesuit$, A$\heartsuit$, 10$\diamondsuit$ and 8$\spadesuit$. The trumps are spades.
+Here we have a situation, when we have 2 eligible moves, and we can risk our higher value 10$\spadesuit$ to gain the Q$\spadesuit$, but
+we also know that there is a risk that the Right AI has A$\spadesuit$, which will beat everyone, hence by using the 10$\spadesuit$ card,
+we will lose more points than if we use the K$\diamondsuit$. For making the best decision,
+our algorithm will use stochastic minimax algorithm, consider all possible combination of 4 remaining cards that our opponent can
+possibly have, and return the best choice according to it. Here is the general process of the algorithm for this specific scenario.
+
+
+\begin{tikzpicture}[scale=1.8,font=\footnotesize]
+\tikzstyle{max node}=[regular polygon, regular polygon sides=3, minimum size=1.6cm, draw,inner sep=1.5,fill=white]
+\tikzstyle{min node}=[regular polygon, regular polygon sides=3, minimum size=1.1cm, shape border rotate=180, draw,inner sep=1.5,fill=white]
+\tikzstyle{chance node}=[circle, minimum size=0.8cm, draw,fill=white]
+\tikzstyle{reg node}=[regular polygon, regular polygon sides=4, minimum size=1cm, draw,inner sep=1.5,fill=white]
+\tikzstyle{level 1}=[level distance=15mm,sibling distance=5cm]
+\tikzstyle{level 2}=[level distance=15mm,sibling distance=0.7cm]
+\tikzstyle{level 3}=[level distance=15mm,sibling distance=0.4cm]
+\node(0)[reg node, align=center](root){\textcolor{black}{\textbf{\scriptsize -3.83}}}
+child{node[max node,label=above left:{$10\spadesuit$}]{\textcolor{black}{\textbf{\tiny -3.83}}}
+    child{node[chance node,label=below:{\tiny $(A\heartsuit, 10\diamondsuit)$}]{\textcolor{black}{\textbf{\tiny 20}}}
+        child{node[min node, label=above:{\tiny $A\heartsuit$}]{\textcolor{black}{\textbf{\tiny 21}}}}
+        child{node[min node, label=above:{\tiny $10\diamondsuit$}]{\textcolor{black}{\textbf{\tiny 20}}}}
+        edge from parent node[left]{$\frac{1}{6}$}
+    }
+    child{node[chance node,label=below:{\tiny $(A\spadesuit, 10\diamondsuit)$}]{\textcolor{black}{\textbf{\tiny -21}}}
+        child{node[min node, label=above:{\tiny $A\spadesuit$}]{\textcolor{black}{\textbf{\tiny -21}}}}
+        edge from parent node[left]{$\frac{1}{6}$}
+    }
+    child{node[chance node,label=below:{\tiny $(8\spadesuit, 10\diamondsuit)$}]{\textcolor{black}{\textbf{\tiny 10}}}
+        child{node[min node, label=above:{\tiny $8\spadesuit$}]{\textcolor{black}{\textbf{\tiny 10}}}}
+        edge from parent node[left]{$\frac{1}{6}$}
+    }
+    child{node[chance node,label=below:{\tiny $(A\heartsuit, A\spadesuit)$}]{\textcolor{black}{\textbf{\tiny -21}}}
+        child{node[min node, label=above:{\tiny $A\spadesuit$}]{\textcolor{black}{\textbf{\tiny -21}}}}
+        edge from parent node[left]{$\frac{1}{6}$}
+    }
+    child{node[chance node,label=below:{\tiny $(A\heartsuit, 8\spadesuit)$}]{\textcolor{black}{\textbf{\tiny 10}}}
+        child{node[min node, label=above:{\tiny $8\spadesuit$}]{\textcolor{black}{\textbf{\tiny 10}}}}
+        edge from parent node[left]{$\frac{1}{6}$}
+    }
+    child{node[chance node,label=below:{\tiny $(A\spadesuit, 8\spadesuit)$}]{\textcolor{black}{\textbf{\tiny -21}}}
+        child{node[min node, label=above:{\tiny $A\spadesuit$}]{\textcolor{black}{\textbf{\tiny -21}}}}
+        edge from parent node[left]{$\frac{1}{6}$}
+    }
+    edge from parent node[left]{\textcolor{black}{\textbf{\scriptsize 5}}}
+}
+child{node[max node,label=above right:{$K\diamondsuit$}]{\textcolor{black}{\textbf{\tiny -6.5}}}
+    child{node[chance node,label=below:{\tiny $(A\heartsuit, 10\diamondsuit)$}]{\textcolor{black}{\textbf{\tiny14}}}
+        child{node[min node, label=above:{\tiny $A\heartsuit$}]{\textcolor{black}{\textbf{\tiny 15}}}}
+        child{node[min node, label=above:{\tiny $10\diamondsuit$}]{\textcolor{black}{\textbf{\tiny 14}}}}
+        edge from parent node[left]{$\frac{1}{6}$}
+    }
+    child{node[chance node,label=below:{\tiny $(A\spadesuit, 10\diamondsuit)$}]{\textcolor{black}{\textbf{\tiny -15}}}
+        child{node[min node, label=above:{\tiny $A\spadesuit$}]{\textcolor{black}{\textbf{\tiny -15}}}}
+        edge from parent node[left]{$\frac{1}{6}$}
+    }
+    child{node[chance node,label=below:{\tiny $(8\spadesuit, 10\diamondsuit)$}]{\textcolor{black}{\textbf{\tiny -4}}}
+        child{node[min node, label=above:{\tiny $8\spadesuit$}]{\textcolor{black}{\textbf{\tiny -4}}}}
+        edge from parent node[left]{$\frac{1}{6}$}
+    }
+    child{node[chance node,label=below:{\tiny $(A\heartsuit, A\spadesuit)$}]{\textcolor{black}{\textbf{\tiny -15}}}
+        child{node[min node, label=above:{\tiny $A\spadesuit$}]{\textcolor{black}{\textbf{\tiny -15}}}}
+        edge from parent node[left]{$\frac{1}{6}$}
+    }
+    child{node[chance node,label=below:{\tiny $(A\heartsuit, 8\spadesuit)$}]{\textcolor{black}{\textbf{\tiny -4}}}
+        child{node[min node, label=above:{\tiny $8\spadesuit$}]{\textcolor{black}{\textbf{\tiny -4}}}}
+        edge from parent node[left]{$\frac{1}{6}$}
+    }
+    child{node[chance node,label=below:{\tiny $(A\spadesuit, 8\spadesuit)$}]{\textcolor{black}{\textbf{\tiny -15}}}
+        child{node[min node, label=above:{\tiny $A\spadesuit$}]{\textcolor{black}{\textbf{\tiny -15}}}}
+        child{node[min node, label=above:{\tiny $8\spadesuit$}]{\textcolor{black}{\textbf{\tiny 4}}}}
+        edge from parent node[left]{$\frac{1}{6}$}
+    }
+    edge from parent node[left]{}
+}
+\end{tikzpicture}
+
+Hence, according to the algorithm, the AI will pick A$\spadesuit$ for this play. This algorithm is going to
+have issues if it is not intertwined with other plays as well, as it may use strong cards whenever it can, without trying to
+save them for a better occasion, and vice versa. However, it can be modified into a specific algorithm, that would
+use many aspects of stochastic minimax and have additional conditions for a better heuristic.
