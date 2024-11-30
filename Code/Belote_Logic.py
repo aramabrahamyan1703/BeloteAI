@@ -50,7 +50,7 @@ class Cards:
         self.standard_cards: list[int] = [11, 4, 3, 2, 10, 0, 0, 0] # T, K, D, V, 10, 9, 8, 7
         self.trump_cards: list[int] = [11, 4, 3, 20, 10, 14, 0, 0]
         self.no_trump_cards: list[int] = [19, 4, 3, 2, 10, 0, 0, 0]
-        self.trump_suit: int = 4  # 0 - Hearts, 1 - Spades, 2 - Clubs, 3 - Diamonds, 4 - No_Trumps
+        self.trump_suit: int = 1  # 0 - Hearts, 1 - Spades, 2 - Clubs, 3 - Diamonds, 4 - No_Trumps
         self.deck = None
         
     def who_takes(self, cards: list[list[int]]):
@@ -92,9 +92,4 @@ class Cards:
                 return self.trump_cards[card[0]]
             return self.standard_cards[card[0]]
         return self.no_trump_cards[card[0]]
-        
-game = Cards()
-game.create_deck()
-print(game.who_takes([(6, 0), (5, 0), (5, 2), (4, 0)]))
-
         

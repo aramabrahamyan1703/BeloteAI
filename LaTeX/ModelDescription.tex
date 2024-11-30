@@ -125,23 +125,25 @@ For example consider the case when there aer only 2 cards left for each player, 
 
 \end{tikzpicture}
 
-The algorithm calculated that the remaining cards in the game (besides its own and the ones played are:
+The algorithm calculated that the remaining cards in the game (besides its own and the ones played) are:
 A$\spadesuit$, A$\heartsuit$, 10$\diamondsuit$ and 8$\spadesuit$. The trumps are spades.
 Here we have a situation, when we have 2 eligible moves, and we can risk our higher value 10$\spadesuit$ to gain the Q$\spadesuit$, but
 we also know that there is a risk that the Right AI has A$\spadesuit$, which will beat everyone, hence by using the 10$\spadesuit$ card,
 we will lose more points than if we use the K$\diamondsuit$. For making the best decision,
 our algorithm will use stochastic minimax algorithm, consider all possible combination of 4 remaining cards that our opponent can
 possibly have, and return the best choice according to it. Here is the general process of the algorithm for this specific scenario.
-
-
+\pagebreak
+\begin{center}
 \begin{tikzpicture}[scale=1.8,font=\footnotesize]
-\tikzstyle{max node}=[regular polygon, regular polygon sides=3, minimum size=1.6cm, draw,inner sep=1.5,fill=white]
-\tikzstyle{min node}=[regular polygon, regular polygon sides=3, minimum size=1.1cm, shape border rotate=180, draw,inner sep=1.5,fill=white]
-\tikzstyle{chance node}=[circle, minimum size=0.8cm, draw,fill=white]
-\tikzstyle{reg node}=[regular polygon, regular polygon sides=4, minimum size=1cm, draw,inner sep=1.5,fill=white]
-\tikzstyle{level 1}=[level distance=15mm,sibling distance=5cm]
-\tikzstyle{level 2}=[level distance=15mm,sibling distance=0.7cm]
-\tikzstyle{level 3}=[level distance=15mm,sibling distance=0.4cm]
+    \tikzset{
+        max node/.style={regular polygon, regular polygon sides=3, minimum size=1.6cm, draw, inner sep=1.5, fill=white},
+        min node/.style={regular polygon, regular polygon sides=3, minimum size=1.1cm, shape border rotate=180, draw, inner sep=1.5, fill=white},
+        chance node/.style={circle, minimum size=0.8cm, draw, fill=white},
+        reg node/.style={regular polygon, regular polygon sides=4, minimum size=1cm, draw, inner sep=1.5, fill=white},
+        level 1/.style={level distance=15mm, sibling distance=5cm},
+        level 2/.style={level distance=15mm, sibling distance=0.7cm},
+        level 3/.style={level distance=15mm, sibling distance=0.4cm}
+      }
 \node(0)[reg node, align=center](root){\textcolor{black}{\textbf{\scriptsize -3.83}}}
 child{node[max node,label=above left:{$10\spadesuit$}]{\textcolor{black}{\textbf{\tiny -3.83}}}
     child{node[chance node,label=below:{\tiny $(A\heartsuit, 10\diamondsuit)$}]{\textcolor{black}{\textbf{\tiny 20}}}
@@ -199,8 +201,9 @@ child{node[max node,label=above right:{$K\diamondsuit$}]{\textcolor{black}{\text
         edge from parent node[left]{$\frac{1}{6}$}
     }
     edge from parent node[left]{}
-}
+};
 \end{tikzpicture}
+\end{center}
 
 Hence, according to the algorithm, the AI will pick A$\spadesuit$ for this play. This algorithm is going to
 have issues if it is not intertwined with other plays as well, as it may use strong cards whenever it can, without trying to

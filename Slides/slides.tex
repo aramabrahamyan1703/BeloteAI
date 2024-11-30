@@ -1,0 +1,411 @@
+\documentclass{beamer}
+\usepackage{tikz} % For graphs and graphics
+\usetikzlibrary{shapes.geometric, shapes.misc, arrows, positioning}
+\def\checkmark{\tikz\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;} % Define a checkmark (tick), used in section 2
+
+\graphicspath{ {figures/} }
+\setbeamertemplate{page number in head/foot}[totalframenumber]
+\usetheme{Marburg}
+\newenvironment{system}%
+{\left\lbrace\begin{array}{@{}l@{}}}%
+{\end{array}\right.}
+
+\beamersetuncovermixins{\opaqueness<1>{25}}{\opaqueness<2->{15}}
+\begin{document}
+\title{Agent for Bazar Blot}
+\author{G. Hovhannisyan  A. Abrahamyan\\
+M. Khachatryan, M. Davtyan}
+\date{December 3, 2024}
+
+\AtEndDocument{\begin{frame}
+                  \begin{center}
+                      Thank You For Attention!\\
+                      More Information is available at Our\\
+                      \href{https://github.com/aramabrahamyan1703/BeloteAI}{Github Repository}
+                  \end{center}
+               \end{frame}
+                }
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}\frametitle{Table of contents}\tableofcontents
+\end{frame}
+
+
+\section{Introduction}
+\begin{frame}\frametitle{Introduction}
+    \begin{center}
+        \textbf{Introduction}
+    \end{center}
+\end{frame}
+
+\begin{frame}\frametitle{Introduction}
+\begin{center}
+    \begin{columns}
+        \begin{column}{5cm}
+        \begin{itemize}
+        \item The Origin of the Game
+        \item General Rules
+        \end{itemize}
+        \end{column}
+        \begin{column}{2cm}
+            \begin{itemize}
+                \item Bidding
+                \item Playing
+            \end{itemize}
+        \end{column}
+    \end{columns}
+    \vspace{15pt}
+            \begin{tabular}{|c|c|c|c|}
+                \hline
+                \textbf{Card} & \textbf{Trump} & \textbf{Regular} & \textbf{No-Trumps}\\
+                \hline
+                A & 11 & 11 & 19\\
+                \hline
+                K & 4 & 4 & 4\\
+                \hline
+                Q & 3 & 3 & 3\\
+                \hline
+                J & 20 & 2 & 2\\
+                \hline
+                10 & 10 & 10 & 10\\
+                \hline
+                9 & 14 & 0 & 0\\
+                \hline
+                8 & 0 & 0 & 0\\
+                \hline
+                7 & 0 & 0 & 0\\
+                \hline
+            \end{tabular}
+
+\end{center}
+\end{frame}
+
+\begin{frame}\frametitle{Introduction}
+    \begin{center}
+    \begin{tikzpicture}[scale=0.65]
+
+        \draw[thick] (0,0) rectangle (10,6);  % Rectangle table dimensions
+        
+        \foreach \i in {0,1,2,3,4,5,6,7}
+            \draw[thick, draw=black, fill=white] (1, 5-\i*0.5) rectangle (0, 5-\i*0.5-0.8);
+        \foreach \i in {0,1,2,3,4,5,6,7}
+            \draw[thick, draw=black, fill=white] (10, 5-\i*0.5) rectangle (9, 5-\i*0.5-0.8);
+        \foreach \i in {0,1,2,3,4,5,6,7}
+            \draw[thick, draw=black, fill=white] (2.8 + \i*0.5, 6) rectangle (3.5 + \i*0.5, 5);
+        \foreach \i in {0,1,2,3,4,5,6,7}
+            \draw[thick, draw=black, fill=white] (2.8 + \i*0.5, 0) rectangle (3.5 + \i*0.5, 1);
+        
+        \draw[thick] (-1.5, 3) circle(0.9);
+        % Right side chair
+        \draw[thick] (11.5, 3) circle(0.9);
+        % Top side chair
+        \draw[thick] (5, 7.5) circle(0.9);
+        % Bottom side chair
+        \draw[thick] (5, -1.5) circle(0.9);
+        
+        \node at (-1.5, 3) {\scriptsize Left AI};
+        \node at (-1.45, 1.6) {\scriptsize Bid - 9 $\clubsuit$};
+        \node at (11.5, 3) {\scriptsize Right AI};
+        \node at (5, 7.5) {\scriptsize Top AI};
+        \node at (5, -1.5) {\scriptsize Player};
+        \node at (5.2, -3) {\scriptsize First Player, Bid - 8 $\spadesuit$};
+        
+        \node at (3.1, 5.5) {\tiny \textcolor{red}{7$\diamondsuit$}};
+        \node at (3.6, 5.5) {\tiny \textcolor{black}{9$\spadesuit$}};
+        \node at (4.1, 5.5) {\tiny \textcolor{black}{K$\spadesuit$}};
+        \node at (4.6, 5.5) {\tiny \textcolor{red}{J$\heartsuit$}};
+        \node at (5.1, 5.5) {\tiny \textcolor{red}{9$\diamondsuit$}};
+        \node at (5.6, 5.5) {\tiny \textcolor{red}{8$\diamondsuit$}};
+        \node at (6.1, 5.5) {\tiny \textcolor{black}{A$\clubsuit$}};
+        \node at (6.7, 5.5) {\tiny \textcolor{black}{10$\spadesuit$}};
+        
+        \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\section{Cheating Mini-Max}
+\begin{frame}\frametitle{Cheating Mini-Max}
+    \begin{center}
+        \textbf{Cheating Mini-Max}
+    \end{center}
+\end{frame}
+
+\subsection{Expectimax}
+\begin{frame}\frametitle{Expectimax}
+    Without resorting to cheating we will have $\binom{24}{8}$ nodes in our first depth!\\
+    \begin{center}
+    \begin{figure}
+    \caption{Example of a Game}
+    \begin{tikzpicture}[scale=0.6]
+
+        \draw[thick] (0,0) rectangle (10,6);  % Rectangle table dimensions
+        
+        \draw[thick, draw=black, fill=white] (1.2, 3.5-0.5) rectangle (0, 3.5-0.5-0.8);
+        \draw[thick, draw=black, fill=white] (4.2, 3.3) rectangle (3, 2.5);
+        \foreach \i in {0,1}
+            \draw[thick, draw=black, fill=white] (10, 3.5-\i*0.5) rectangle (8.8, 3.5-\i*0.5-0.8);
+        \foreach \i in {0,1}
+            \draw[thick, draw=black, fill=white] (5 + \i*0.5, 6) rectangle (4.2 + \i*0.5, 5);
+        \draw[thick, draw=black, fill=white] (5.1 + 0.5, 0) rectangle (4.2 + 0.5, 1.1);
+        \draw[thick, draw=black, fill=white] (5.1 + 0.5, 3.3) rectangle (4.2 + 0.5, 2.1);
+        
+        \draw[thick] (-1.5, 3) circle(0.9);
+        % Right side chair
+        \draw[thick] (11.5, 3) circle(0.9);
+        % Top side chair
+        \draw[thick] (5, 7.5) circle(0.9);
+        % Bottom side chair
+        \draw[thick] (5, -1.5) circle(0.9);
+        
+        \node at (-1.5, 3) {\scriptsize Left AI};
+        \node at (-1.45, 1.6) {\scriptsize Card - Q $\clubsuit$};
+        \node at (11.5, 3) {\scriptsize Right AI};
+        \node at (5, 7.5) {\scriptsize Top AI};
+        \node at (5, -1.5) {\scriptsize Player};
+        \node at (5.2, -3) {\scriptsize First Player, Card - 10$\clubsuit$};
+        
+        \node [rotate=270] at (3.6, 2.9) {\tiny \textcolor{black}{Q $\clubsuit$}};
+        \node at (5.15, 2.7) { \tiny \textcolor{black}{10 $\clubsuit$}};
+        \node at (5.1, 5.45) {\tiny \textcolor{black}{10 $\spadesuit$}};
+        \node at (4.45, 5.45) {\tiny \textcolor{red}{K$\diamondsuit$}};
+        
+        
+        \end{tikzpicture}
+    \end{figure}
+    \end{center}
+\end{frame}
+
+\begin{frame}\frametitle{Expectimax}
+    \begin{center}
+        \begin{figure}
+        \caption{Example of Expectimax tree}
+	    \includegraphics[width=10cm]{MiniMax_Tree.png}
+        \end{figure}
+    \end{center}        
+\end{frame}
+
+\subsection{Mini-Max}
+\begin{frame}\frametitle{Mini-Max}
+    \begin{itemize}
+        \item Assuming we know everyone's cards what's the approximate number of terminal states?
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Mini-Max}
+        \begin{itemize}
+            \item Assuming we know everyone's cards what's the approximate number of terminal states?
+            \item $(8!)^4$
+            \item We can't use normal Mini-Max either even with alpha-beta pruning.
+        \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Depth-Limited Cheating Mini-Max}
+    \begin{itemize}
+        \item Depth is limited to 12.
+        \item Uses alpha-beta pruning.
+        \item Heuristic is the current score / 10.
+        \item It plays slightly worse than a random bot.
+    \end{itemize}
+\end{frame}
+
+
+\section{Analytical Solution}
+\begin{frame}\frametitle{Analytical Solution}
+\begin{center}
+    \textbf{Analytical Solution}
+\end{center}
+\end{frame}
+
+
+\begin{frame}\frametitle{Analytical Solution}
+\begin{equation*}
+    \begin{system}
+        x^{\prime} = -\beta x  y 
+		\\
+		y^{\prime} = \beta x  y - \gamma y 
+		\\
+		z^{\prime} = \gamma z 
+		\\
+		x + y + z = N
+		\\
+		x_0 = N_1, y_0 = N_2, z_0 = N_3
+    \end{system}
+\end{equation*}
+Step 1) Differentiating $x$ with respect to time $t$, and substituting $y^{\prime}$.
+\begin{equation*} 
+	\begin{split}
+		x^{\prime\prime} =
+		-\beta\left( x^{\prime}\left(\frac{-x^{\prime}}{\beta x}\right) + x y^{\prime}\right)
+		 & \implies \frac{-x^{\prime\prime}}{\beta} = \frac{-(x^{\prime})^{2}}{\beta x} + x y^{\prime}                             \\
+		 & \implies x y^{\prime} = \frac{-x^{\prime\prime}}{\beta} + \frac{-(x^{\prime})^{2}}{\beta x}                             \\
+		 & \implies y^{\prime} =  \frac{-1}{\beta}\left(\frac{-x^{\prime\prime}}{x} - \left(\frac{x^{\prime}}{x}\right)^{2}\right)
+	\end{split}
+\end{equation*}
+\end{frame}
+
+\begin{frame}\frametitle{Analytical Solution}
+Step 2) Next we insert $y = \frac{-x^{\prime}}{\beta x}$ into $y^{\prime}$ and equate it to \\Step (1)
+\begin{equation*} 
+	\begin{split}
+		-x^{\prime} + \frac{\gamma x^{\prime}}{\beta x} =
+		\frac{-1}{\beta}\left(\frac{-x^{\prime\prime}}{x} - \left(\frac{x^{\prime}}{x}\right)^{2}\right)\\
+		\implies \beta x^{\prime} - \frac{\gamma x^{\prime}}{x} = \frac{x^{\prime\prime}}{x} - \left(\frac{x^{\prime}}{x}\right)^{2}    \\
+		\implies \frac{x^{\prime\prime}}{x} - \left(\frac{x^{\prime}}{x}\right)^{2} + \frac{\gamma x^{\prime}}{x} - \beta x^{\prime}= 0
+	\end{split}
+\end{equation*}
+Step 3) We also have that $y = \frac{-x^{\prime}}{\beta x}$ and $y = \frac{z^{\prime}}{\gamma}$.
+Equating them we get
+\begin{equation*}
+	\frac{-x^{\prime}}{\beta x} = \frac{z^{\prime}}{\gamma}
+	\implies z^{\prime} = -\frac{\gamma}{\beta}\left(\frac{x^{\prime}}{x}\right)
+\end{equation*}
+\end{frame}
+
+\begin{frame}\frametitle{Analytical Solution}
+Step 4) Next we integrate Step (3)
+\begin{equation*} 
+	\begin{split}
+		c_{1} + z = -\frac{\gamma}{\beta} \int \frac{x^{\prime}}{x} \,dt
+		 & \implies c_{1} + z = -\frac{\gamma}{\beta}\left(\ln(x) + c_{2}\right)                                       \\
+		 & \implies \ln(x) = -\frac{\beta c_{1}}{\gamma} -\frac{\beta z}{\gamma} - c_{2}                               \\
+		 & \implies x = e^{-\frac{\beta z}{\gamma}} \cdot e^{-\frac{\beta c_{1}}{\gamma} - c_{2}}                      \\
+		 & \implies x = x_{0}e^{-\frac{\beta z}{\gamma}}  \hspace{\parindent}  
+	\end{split}
+\end{equation*}
+Where $x_{0}$ is an integration constant.
+\end{frame}
+
+\begin{frame}\frametitle{Analytical Solution}
+    Step 5) From Step(4) we get that 
+    \begin{equation*} 
+        x^{\prime} = -\frac{x_{0}\beta}{\gamma} z^{\prime} e^{-\frac{\beta z}{\gamma}}
+    \end{equation*}
+    Step 6) Instead of integrating we differentiate Step (3) and get
+    \begin{equation*}
+        z^{\prime\prime} = -\frac{\gamma}{\beta}\left(\frac{x^{\prime\prime}}{x} - \left(\frac{x^{\prime}}{x}\right)^{2} \right)
+    \end{equation*}
+    Step 7) Finally if we combine Step(6), Step(5) and Step(3) into Step(2) we get
+    \begin{equation*}
+        z^{\prime\prime} = x_{0} \beta z^{\prime} e^{-\frac{\beta z}{\gamma}} - \gamma z^{\prime}
+    \end{equation*}
+\end{frame}
+
+\begin{frame}\frametitle{Analytical Solution}
+    All the other steps can be found in the paper in Appendix B, but eventually we get the parametric form
+    \begin{align*}
+        x &= x_0u,\\
+        y &= \frac{\gamma}{\beta}\ln u - x_0u - \frac{C_1}{\beta},\\
+        z &= -\frac{\gamma}{\beta}\ln u
+    \end{align*}
+Where $u_0 = e^{-\frac{\beta}{\gamma}N_3}$, $C_1 = -\beta N$.\\
+And the relation between $u$ and $t$ being as follows
+\begin{equation*} 
+	t = \int_{u_0}^{u} \frac{du}{u(C_1-\gamma \ln u + x_0\beta u)}
+\end{equation*}
+\end{frame}
+\begin{frame}\frametitle{Analytical Solution}
+
+    Plotted Using Values$\quad$ $N_1=20, \quad N_2=15, \quad N_3=10, \quad \beta = 0.01, \quad \gamma = 0.02$
+\end{frame}
+
+
+
+\section{Numerical Methods for Solving the SIR}
+\subsection{Euler's Method}
+
+\begin{frame}\frametitle{Numerical Solutions}
+\begin{itemize}
+\item Euler's Method
+\item Backward Euler's Method
+\end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Euler's Method}
+    By using the extension $y'(x) \approx \frac{y_{k+1}-y_{k}}{h}$ and having the
+$y_0$, we can iteratively predict the $y_{k+1}=y(x+h)$, by using the system
+\vspace{1.5cm}
+\large
+\begin{equation*}
+    \begin{system}
+	    y_{k+1} = y_k + h\cdot f(x_k,y_k)
+        \\
+        y(x_0)=y_0
+    \end{system}
+\end{equation*}
+
+\end{frame}
+
+\begin{frame}\frametitle{Euler's Method}
+
+\end{frame}
+
+\begin{frame}\frametitle{Euler's Method}
+In case of SIR, we are solving 3 ODE's, hence we are solving a system
+for $s_{k+1}, i_{k+1}$, and $r_{k+1}$, given the $s_0, i_0, r_0$
+\vspace{0.7cm}
+\Large
+\[
+	\left\{
+		\begin{array}{l}
+			s_{k+1}=s_k - \beta \cdot h \cdot s_k \cdot i_k \\
+			i_{k+1}=i_k + (\beta \cdot s_k \cdot i_k - \gamma \cdot i_k) \cdot h \\
+			r_{k+1}=r_k+ \gamma \cdot h \cdot i_k
+		\end{array}
+	\right.
+\]
+\end{frame}
+
+\begin{frame}\frametitle{Backward Euler's Method}
+\subsection{Backward Euler's Method}
+This time, the Method uses a different approach, namely
+
+\begin{equation*}
+	y'(x) \approx \frac{y_k-y_{k+1}}{h}
+\end{equation*}
+
+Plugging the SIR ODE's, we will get the system
+
+    \begin{equation*}
+        \begin{system}
+        s_{t+1} = s_t - h \cdot \beta s_{t+1} i_{t+1}
+        \\
+        i_{t+1} = i_t + h \cdot (\beta s_{t+1} i_{t+1} - \gamma i_{t+1})
+        \\
+        r_{t+1}= r_t + h\cdot \gamma i_{t+1}
+        \end{system}
+    \end{equation*}
+    \vspace{0.3cm}
+\\
+    By solving each one of these SLE's, we will get the next approximations for $s_k,i_k,r_k$
+\end{frame}
+
+\begin{frame}\frametitle{Backward Euler's Method}
+
+\end{frame}
+
+\section{Simulation Results on Real-World Data}
+\begin{frame}\frametitle{Simulations}
+    \begin{center}
+        \textbf{Simulations on USA's COVID-19 Data}
+    \end{center}
+\end{frame}
+
+\subsection{Active Cases}
+\begin{frame}\frametitle{Active Cases}
+
+\end{frame}
+
+\subsection{Simulations on USA's COVID-19 Data}
+\begin{frame}\frametitle{Simulations on USA's COVID-19 Data}
+
+\end{frame}
+
+\subsection{Simulations on Armenia's COVID-19 Data}
+\begin{frame}\frametitle{Simulations on Armenia's COVID-19 Data}
+
+\end{frame}
+
+\end{document}

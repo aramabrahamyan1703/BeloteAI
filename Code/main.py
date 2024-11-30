@@ -9,12 +9,14 @@ import time
 import copy
 import random
 import curses
+from Alpha_Beta_Search import Alpha_Beta_Search
 
 curses.initscr()
 curses.curs_set(0)
 
-OUR_FINAL_SCORE = 3001
-THEIR_FINAL_SCORE = 30000
+OUR_FINAL_SCORE = 0
+THEIR_FINAL_SCORE = 0
+CHANGE_WHOSAID = 1
 
 #The game is written with the state machine design pattern (mostly, hopefully)
 class GameState(Enum):
@@ -91,12 +93,11 @@ class PlayersManager(GameManager): # Inherits GameManager
         self.turn = 0
         self.noTrumps = False
         self.noTrumpsFinal = False
-        
-        self.auction_result: list = [None, None, None, None] # KP (0 - no KP, 1 - KP), Suits, Value, Who Called(0 - Us, 1 - Them)
-        
+        global CHANGE_WHOSAID
+        #self.auction_result: list = [None, None, None, None] # KP (0 - no KP, 1 - KP), Suits, Value, Who Called(0 - Us, 1 - Them)
+        self.auction_result: list = [0, 1, 8, CHANGE_WHOSAID] # KP (0 - no KP, 1 - KP), Suits, Value, Who Called(0 - Us, 1 - Them)
         self.auction_curr_num: list[int] = [self.auction_start_num] * 4
         self.setup_players_with_cards()
-        
 
         self.set_title("Press q to quit") 
         
@@ -117,9 +118,8 @@ class PlayersManager(GameManager): # Inherits GameManager
             self.quit() 
             
         if self.game_state == GameState.DEALING.value:
-            if time.time() - self.start_time > 3:
+            if time.time() - self.start_time > 3: #3: HERE
                 self.game_state = GameState.AUCTIONSUITS.value
-                #self.game_state = GameState.MAINGAME.value
         
         if self.game_state == GameState.AUCTIONSUITS.value:
             if not self.suits_prompt in self._GameManager__game_objects:  #Not a good way to do things but it is what it is
@@ -145,34 +145,43 @@ class PlayersManager(GameManager): # Inherits GameManager
             
             if self.turn == 0:
                 self.main_game_manager()
-            else:
+            elif self.turn == 1 or self.turn == 3:
                 self.random_main_game_bot()
+            else:
+                self.minimax_main_game_bot()
             pass
         
         if self.game_state == GameState.ENDROUND.value:
-            if time.time() - self.final_timer > 5:
+            if time.time() - self.final_timer > 5: #Was 5
                 self._GameManager__game_objects = []
                 flag = False
                 
                 global OUR_FINAL_SCORE
                 global THEIR_FINAL_SCORE
+                global CHANGE_WHOSAID
+                
+                we_won = False
                 
                 if OUR_FINAL_SCORE > 300 and THEIR_FINAL_SCORE > 300:
                     flag = True
                     if OUR_FINAL_SCORE > THEIR_FINAL_SCORE:
                         self.final_window.set_winner(0)
+                        we_won = True
                     else:
                         self.final_window.set_winner(1)
+                        
                 if OUR_FINAL_SCORE > 300 and THEIR_FINAL_SCORE <= 300:
                     self.final_window.set_winner(0)
                     flag = True
+                    we_won = True
                 if THEIR_FINAL_SCORE > 300 and OUR_FINAL_SCORE <= 300:
                     self.final_window.set_winner(1)
                     flag = True
                     
                 if flag:
+                    CHANGE_WHOSAID = (1 + CHANGE_WHOSAID) % 2
                     self.add_object(self.final_window)
-                    if time.time() - self.winner_start_time > 8:
+                    if time.time() - self.winner_start_time > 8: # Was 8
                         OUR_FINAL_SCORE = 0
                         THEIR_FINAL_SCORE = 0
                         self._GameManager__game_objects = []
@@ -183,7 +192,7 @@ class PlayersManager(GameManager): # Inherits GameManager
         
         if self.game_state == GameState.WAITINGFORCARD.value:
             self.clear_card_prompts(self.main_cards)
-            if time.time() - self.deal_start_time > 0:
+            if time.time() - self.deal_start_time > 1: #Was 1
                 self.game_state = GameState.PLAYINGCARD.value
         
         if self.game_state == GameState.PLAYINGCARD.value:
@@ -200,7 +209,8 @@ class PlayersManager(GameManager): # Inherits GameManager
             self.turn = (self.turn + who_took[0]) % 4 
             for card in self.played_cards:
                 card.end_turn(self.turn % 2)
-                self.our_taken_cards.append(card)
+                if self.turn % 2 == 0:
+                    self.our_taken_cards.append(card)
             self.played_cards = []
             self.last_took = self.turn % 2
             self.first_played_card_suit = None
@@ -216,7 +226,7 @@ class PlayersManager(GameManager): # Inherits GameManager
         global THEIR_FINAL_SCORE
         
         #We made the final auction
-        if self.auction_result[3] == 0:     
+        if self.auction_result[3] == 0:    
             if our_total_score < self.auction_result[2] * 10:
                 THEIR_FINAL_SCORE += 16 + self.auction_result[2]
                 return [OUR_FINAL_SCORE, THEIR_FINAL_SCORE]
@@ -236,6 +246,13 @@ class PlayersManager(GameManager): # Inherits GameManager
     def random_main_game_bot(self):
         valid_cards = self.get_valid_cards(self.first_played_card_suit, self.turn)
         card = random.choice(valid_cards)
+        if self.first_played_card_suit == None:
+            self.first_played_card_suit = card.card[1]
+        self.play_card(card, self.turn)
+        self.game_state = GameState.WAITINGFORCARD.value
+        
+    def minimax_main_game_bot(self):
+        card = self.get_player_cards(self.turn)[Alpha_Beta_Search(game, self)]
         if self.first_played_card_suit == None:
             self.first_played_card_suit = card.card[1]
         self.play_card(card, self.turn)
