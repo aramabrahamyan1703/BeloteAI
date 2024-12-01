@@ -212,106 +212,109 @@ M. Khachatryan, M. Davtyan}
 \end{frame}
 
 
-\section{Analytical Solution}
-\begin{frame}\frametitle{Analytical Solution}
+\section{Simulation Results}
+\begin{frame}\frametitle{Simulation Results}
 \begin{center}
-    \textbf{Analytical Solution}
+    \textbf{Simulation Results}
 \end{center}
 \end{frame}
 
 
-\begin{frame}\frametitle{Analytical Solution}
-\begin{equation*}
-    \begin{system}
-        x^{\prime} = -\beta x  y 
-		\\
-		y^{\prime} = \beta x  y - \gamma y 
-		\\
-		z^{\prime} = \gamma z 
-		\\
-		x + y + z = N
-		\\
-		x_0 = N_1, y_0 = N_2, z_0 = N_3
-    \end{system}
-\end{equation*}
-Step 1) Differentiating $x$ with respect to time $t$, and substituting $y^{\prime}$.
-\begin{equation*} 
-	\begin{split}
-		x^{\prime\prime} =
-		-\beta\left( x^{\prime}\left(\frac{-x^{\prime}}{\beta x}\right) + x y^{\prime}\right)
-		 & \implies \frac{-x^{\prime\prime}}{\beta} = \frac{-(x^{\prime})^{2}}{\beta x} + x y^{\prime}                             \\
-		 & \implies x y^{\prime} = \frac{-x^{\prime\prime}}{\beta} + \frac{-(x^{\prime})^{2}}{\beta x}                             \\
-		 & \implies y^{\prime} =  \frac{-1}{\beta}\left(\frac{-x^{\prime\prime}}{x} - \left(\frac{x^{\prime}}{x}\right)^{2}\right)
-	\end{split}
-\end{equation*}
+\begin{frame}\frametitle{Minimax vs Random Without Auction (Three hand version)}
+\begin{center}
+        \begin{figure}
+	    \includegraphics[width=10cm]{ThreeHandMinimax.png}
+        \end{figure}
+\end{center}
 \end{frame}
 
-\begin{frame}\frametitle{Analytical Solution}
-Step 2) Next we insert $y = \frac{-x^{\prime}}{\beta x}$ into $y^{\prime}$ and equate it to \\Step (1)
-\begin{equation*} 
-	\begin{split}
-		-x^{\prime} + \frac{\gamma x^{\prime}}{\beta x} =
-		\frac{-1}{\beta}\left(\frac{-x^{\prime\prime}}{x} - \left(\frac{x^{\prime}}{x}\right)^{2}\right)\\
-		\implies \beta x^{\prime} - \frac{\gamma x^{\prime}}{x} = \frac{x^{\prime\prime}}{x} - \left(\frac{x^{\prime}}{x}\right)^{2}    \\
-		\implies \frac{x^{\prime\prime}}{x} - \left(\frac{x^{\prime}}{x}\right)^{2} + \frac{\gamma x^{\prime}}{x} - \beta x^{\prime}= 0
-	\end{split}
-\end{equation*}
-Step 3) We also have that $y = \frac{-x^{\prime}}{\beta x}$ and $y = \frac{z^{\prime}}{\gamma}$.
-Equating them we get
-\begin{equation*}
-	\frac{-x^{\prime}}{\beta x} = \frac{z^{\prime}}{\gamma}
-	\implies z^{\prime} = -\frac{\gamma}{\beta}\left(\frac{x^{\prime}}{x}\right)
-\end{equation*}
+\begin{frame}\frametitle{Minimax vs Random Without Auction (One hand version)}
+\begin{center}
+        \begin{figure}
+	    \includegraphics[width=10cm]{OneHandMinimax.png}
+        \end{figure}
+\end{center}
 \end{frame}
 
-\begin{frame}\frametitle{Analytical Solution}
-Step 4) Next we integrate Step (3)
-\begin{equation*} 
-	\begin{split}
-		c_{1} + z = -\frac{\gamma}{\beta} \int \frac{x^{\prime}}{x} \,dt
-		 & \implies c_{1} + z = -\frac{\gamma}{\beta}\left(\ln(x) + c_{2}\right)                                       \\
-		 & \implies \ln(x) = -\frac{\beta c_{1}}{\gamma} -\frac{\beta z}{\gamma} - c_{2}                               \\
-		 & \implies x = e^{-\frac{\beta z}{\gamma}} \cdot e^{-\frac{\beta c_{1}}{\gamma} - c_{2}}                      \\
-		 & \implies x = x_{0}e^{-\frac{\beta z}{\gamma}}  \hspace{\parindent}  
-	\end{split}
-\end{equation*}
-Where $x_{0}$ is an integration constant.
+\begin{frame}\frametitle{Random vs Random Without Auction (Control)}
+\begin{center}
+        \begin{figure}
+	    \includegraphics[width=10cm]{RandomvsRandom.png}
+        \end{figure}
+\end{center}
 \end{frame}
 
-\begin{frame}\frametitle{Analytical Solution}
-    Step 5) From Step(4) we get that 
-    \begin{equation*} 
-        x^{\prime} = -\frac{x_{0}\beta}{\gamma} z^{\prime} e^{-\frac{\beta z}{\gamma}}
-    \end{equation*}
-    Step 6) Instead of integrating we differentiate Step (3) and get
-    \begin{equation*}
-        z^{\prime\prime} = -\frac{\gamma}{\beta}\left(\frac{x^{\prime\prime}}{x} - \left(\frac{x^{\prime}}{x}\right)^{2} \right)
-    \end{equation*}
-    Step 7) Finally if we combine Step(6), Step(5) and Step(3) into Step(2) we get
-    \begin{equation*}
-        z^{\prime\prime} = x_{0} \beta z^{\prime} e^{-\frac{\beta z}{\gamma}} - \gamma z^{\prime}
-    \end{equation*}
+\begin{frame}\frametitle{Combined Plot of the Three Versions}
+\begin{center}
+        \begin{figure}
+	    \includegraphics[width=10cm]{Combined.png}
+        \end{figure}
+\end{center}
 \end{frame}
 
-\begin{frame}\frametitle{Analytical Solution}
-    All the other steps can be found in the paper in Appendix B, but eventually we get the parametric form
-    \begin{align*}
-        x &= x_0u,\\
-        y &= \frac{\gamma}{\beta}\ln u - x_0u - \frac{C_1}{\beta},\\
-        z &= -\frac{\gamma}{\beta}\ln u
-    \end{align*}
-Where $u_0 = e^{-\frac{\beta}{\gamma}N_3}$, $C_1 = -\beta N$.\\
-And the relation between $u$ and $t$ being as follows
-\begin{equation*} 
-	t = \int_{u_0}^{u} \frac{du}{u(C_1-\gamma \ln u + x_0\beta u)}
-\end{equation*}
-\end{frame}
-\begin{frame}\frametitle{Analytical Solution}
-
-    Plotted Using Values$\quad$ $N_1=20, \quad N_2=15, \quad N_3=10, \quad \beta = 0.01, \quad \gamma = 0.02$
+\begin{frame}\frametitle{Game Results With Auction (Control)}
+\begin{center}
+        \begin{figure}
+	    \includegraphics[width=10cm]{control1.png}
+        \end{figure}
+\end{center}
 \end{frame}
 
+\begin{frame}\frametitle{Game Results With Auction (Control)}
+\begin{center}
+        \begin{figure}
+	    \includegraphics[width=10cm]{control2.png}
+        \end{figure}
+\end{center}
+\end{frame}
 
+\begin{frame}\frametitle{Game Results With Auction (Control)}
+\begin{center}
+        \begin{figure}
+	    \includegraphics[width=10cm]{control3.png}
+        \end{figure}
+\end{center}
+\end{frame}
+
+\begin{frame}\frametitle{Game Results With Auction (Control)}
+\begin{center}
+        \begin{figure}
+	    \includegraphics[width=10cm]{control4.png}
+        \end{figure}
+\end{center}
+\end{frame}
+
+\begin{frame}\frametitle{Game Results With Auction (V1 vs V2)}
+\begin{center}
+        \begin{figure}
+	    \includegraphics[width=10cm]{v1v2_1.png}
+        \end{figure}
+\end{center}
+\end{frame}
+
+\begin{frame}\frametitle{Game Results With Auction (V1 vs V2)}
+\begin{center}
+        \begin{figure}
+	    \includegraphics[width=10cm]{v1v2_2.png}
+        \end{figure}
+\end{center}
+\end{frame}
+
+\begin{frame}\frametitle{Game Results With Auction (V1 vs V2)}
+\begin{center}
+        \begin{figure}
+	    \includegraphics[width=10cm]{v1v2_3.png}
+        \end{figure}
+\end{center}
+\end{frame}
+
+\begin{frame}\frametitle{Game Results With Auction (V1 vs V2)}
+\begin{center}
+        \begin{figure}
+	    \includegraphics[width=10cm]{v1v2_4.png}
+        \end{figure}
+\end{center}
+\end{frame}
 
 \section{Numerical Methods for Solving the SIR}
 \subsection{Euler's Method}
