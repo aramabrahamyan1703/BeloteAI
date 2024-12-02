@@ -10,13 +10,13 @@ import copy
 import random
 import curses
 from Alpha_Beta_Search import Alpha_Beta_Search
+from HillClimbingAuction import hill_climb_v1, hill_climb_v2
 
 curses.initscr()
 curses.curs_set(0)
 
 OUR_FINAL_SCORE = 0
 THEIR_FINAL_SCORE = 0
-CHANGE_WHOSAID = 1
 
 #The game is written with the state machine design pattern (mostly, hopefully)
 class GameState(Enum):
@@ -85,6 +85,7 @@ class PlayersManager(GameManager): # Inherits GameManager
         
         self.deal_start_time = time.time()
         self.winner_start_time = time.time()
+        self.bot_auction_time = time.time()
         
         
         self.chosen_suit: list[int] = [None] * 5
@@ -93,10 +94,9 @@ class PlayersManager(GameManager): # Inherits GameManager
         self.turn = 0
         self.noTrumps = False
         self.noTrumpsFinal = False
-        global CHANGE_WHOSAID
-        #self.auction_result: list = [None, None, None, None] # KP (0 - no KP, 1 - KP), Suits, Value, Who Called(0 - Us, 1 - Them)
-        self.auction_result: list = [0, 1, 8, CHANGE_WHOSAID] # KP (0 - no KP, 1 - KP), Suits, Value, Who Called(0 - Us, 1 - Them)
+        self.auction_result: list = [None, None, None, None] # KP (0 - no KP, 1 - KP), Suits, Value, Who Called(0 - Us, 1 - Them)
         self.auction_curr_num: list[int] = [self.auction_start_num] * 4
+        self.auction_players_bids = [[], [], [], []]
         self.setup_players_with_cards()
 
         self.set_title("Press q to quit") 
@@ -118,8 +118,8 @@ class PlayersManager(GameManager): # Inherits GameManager
             self.quit() 
             
         if self.game_state == GameState.DEALING.value:
-            if time.time() - self.start_time > 3: #3: HERE
-                self.game_state = GameState.AUCTIONSUITS.value
+            if time.time() - self.start_time > 3: 
+                self.game_state = GameState.AUCTIONSUITS.value  
         
         if self.game_state == GameState.AUCTIONSUITS.value:
             if not self.suits_prompt in self._GameManager__game_objects:  #Not a good way to do things but it is what it is
@@ -130,7 +130,8 @@ class PlayersManager(GameManager): # Inherits GameManager
             self.auction_prompt_manager()
             
         if self.game_state == GameState.BOTTURNAUCTION.value:
-            self.bot_manager()
+            if time.time() - self.bot_auction_time > 1: 
+                self.bot_manager()
 
         if self.game_state == GameState.MAINGAME.value:
             if not self.main_cards and not self.left_bot_cards and not self.right_bot_cards and not self.top_bot_cards:
@@ -144,7 +145,7 @@ class PlayersManager(GameManager): # Inherits GameManager
                 return 
             
             if self.turn == 0:
-                self.main_game_manager()
+                self.main_game_manager()        
             elif self.turn == 1 or self.turn == 3:
                 self.random_main_game_bot()
             else:
@@ -152,36 +153,30 @@ class PlayersManager(GameManager): # Inherits GameManager
             pass
         
         if self.game_state == GameState.ENDROUND.value:
-            if time.time() - self.final_timer > 5: #Was 5
+            if time.time() - self.final_timer > 5:
                 self._GameManager__game_objects = []
                 flag = False
                 
                 global OUR_FINAL_SCORE
                 global THEIR_FINAL_SCORE
-                global CHANGE_WHOSAID
-                
-                we_won = False
                 
                 if OUR_FINAL_SCORE > 300 and THEIR_FINAL_SCORE > 300:
                     flag = True
                     if OUR_FINAL_SCORE > THEIR_FINAL_SCORE:
                         self.final_window.set_winner(0)
-                        we_won = True
                     else:
                         self.final_window.set_winner(1)
                         
                 if OUR_FINAL_SCORE > 300 and THEIR_FINAL_SCORE <= 300:
                     self.final_window.set_winner(0)
                     flag = True
-                    we_won = True
                 if THEIR_FINAL_SCORE > 300 and OUR_FINAL_SCORE <= 300:
                     self.final_window.set_winner(1)
                     flag = True
                     
                 if flag:
-                    CHANGE_WHOSAID = (1 + CHANGE_WHOSAID) % 2
                     self.add_object(self.final_window)
-                    if time.time() - self.winner_start_time > 8: # Was 8
+                    if time.time() - self.winner_start_time > 8:
                         OUR_FINAL_SCORE = 0
                         THEIR_FINAL_SCORE = 0
                         self._GameManager__game_objects = []
@@ -192,7 +187,7 @@ class PlayersManager(GameManager): # Inherits GameManager
         
         if self.game_state == GameState.WAITINGFORCARD.value:
             self.clear_card_prompts(self.main_cards)
-            if time.time() - self.deal_start_time > 1: #Was 1
+            if time.time() - self.deal_start_time > 1:
                 self.game_state = GameState.PLAYINGCARD.value
         
         if self.game_state == GameState.PLAYINGCARD.value:
@@ -218,13 +213,31 @@ class PlayersManager(GameManager): # Inherits GameManager
     
     def calculate_score(self):
         our_total_score = 10 if self.last_took == 0 else 0
+        count = 0
         for card in self.our_taken_cards:
+            count += 1
             our_total_score += game.get_card_value(card.card)
         their_total_score = 162 - our_total_score
         
         global OUR_FINAL_SCORE
         global THEIR_FINAL_SCORE
         
+        if self.auction_result[2] > 16:
+            if self.auction_result[3] == 0:
+                if count == 32:
+                    OUR_FINAL_SCORE += self.auction_result[2] + 25
+                    return [OUR_FINAL_SCORE, THEIR_FINAL_SCORE]
+                else:
+                    THEIR_FINAL_SCORE += self.auction_result[2] + 16
+                    return [OUR_FINAL_SCORE, THEIR_FINAL_SCORE]
+            else:
+                if count == 32:
+                    THEIR_FINAL_SCORE += self.auction_result[2] + 25
+                    return [OUR_FINAL_SCORE, THEIR_FINAL_SCORE]
+                else:
+                    OUR_FINAL_SCORE += self.auction_result[2] + 16
+                    return [OUR_FINAL_SCORE, THEIR_FINAL_SCORE]
+                    
         #We made the final auction
         if self.auction_result[3] == 0:    
             if our_total_score < self.auction_result[2] * 10:
@@ -403,18 +416,23 @@ class PlayersManager(GameManager): # Inherits GameManager
                     self.first_played_card_suit = valid_cards[i].card[1]
                 self.play_card(card, self.turn)
                 self.game_state = GameState.WAITINGFORCARD.value
-            
+          
     def bot_manager(self):
+        result = hill_climb_v2(manager)
+        self.auction_players_bids[self.turn].append(result)
         
-        '''
-        Test with a random bot TM. The state of the art Random AI which outperforms about 40% of all Bazar Blot players.
-        '''
+        if result[0] != "Pass":
+            self.auction_curr_num[self.turn] = self.auction_start_num + result[0]
+        else:
+            self.auction_curr_num[self.turn] = result[0]
+            
+        self.bot_auction_time = time.time()
         
-        #self.auction_curr_num[self.turn] = random.choice(["Pass", self.auction_start_num + 1, self.auction_start_num + 2])
-        self.auction_curr_num[self.turn] = "Pass"
-        self.chosen_suit[self.turn] = random.choice([0,1,2,3,4])
+        self.chosen_suit[self.turn] = result[1]
+        
         self.auction_start_num = self.auction_curr_num[self.turn] + 1 if self.auction_curr_num[self.turn] != "Pass" else self.auction_start_num
         suit_to_symbol = ["♡", '♤', '♧', '♢', 'A']
+        
         if self.auction_curr_num[self.turn] == "Pass":
             self.change_turn_auction(self.auction_curr_num[self.turn])
         else:
@@ -425,7 +443,7 @@ class PlayersManager(GameManager): # Inherits GameManager
             else:
                 self.auction_result = [0, self.chosen_suit[self.turn], self.auction_curr_num[self.turn], self.turn % 2]
                 self.change_turn_auction(f"{suit_to_symbol[self.chosen_suit[self.turn]]} {self.auction_curr_num[self.turn]}")
-        
+                
     def change_turn_auction(self, text):
         if self.suits_prompt in self._GameManager__game_objects:
             self._GameManager__game_objects.remove(self.suits_prompt)
@@ -434,7 +452,7 @@ class PlayersManager(GameManager): # Inherits GameManager
             self._GameManager__game_objects.remove(self.range_prompt)
             
         if self.turn == 3:
-            self.game_state = GameState.AUCTIONSUITS.value
+            self.game_state = GameState.AUCTIONSUITS.value  #FIRST IS A BOT
         else:
             self.game_state = GameState.BOTTURNAUCTION.value
         

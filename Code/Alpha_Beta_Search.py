@@ -27,7 +27,7 @@ def Max_Value(curr_hand: list, turn: int, hands: list[list], alpha: int, beta: i
     if not flag:
         return (calculate_score(our_score, manager), 0)
     
-    if depth_limit >= 11:
+    if depth_limit >= 7:
         return (our_score / 10, 0)
 
     if len(curr_hand) == 4:
@@ -75,7 +75,7 @@ def Min_Value(curr_hand: list, turn: int, hands: list[list], alpha: int, beta: i
         if len(curr_hand) == 4:
             return (calculate_score(our_score, manager), 0)
         
-    if depth_limit >= 11:
+    if depth_limit >= 7:
         return (our_score / 10, 0)
     
     if len(curr_hand) == 4:
