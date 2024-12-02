@@ -13,7 +13,7 @@
 \beamersetuncovermixins{\opaqueness<1>{25}}{\opaqueness<2->{15}}
 \begin{document}
 \title{Agent for Bazar Blot}
-\author{G. Hovhannisyan  A. Abrahamyan\\
+\author{G. Hovhannisyan,  A. Abrahamyan\\
 M. Khachatryan, M. Davtyan}
 \date{December 3, 2024}
 
@@ -83,7 +83,39 @@ M. Khachatryan, M. Davtyan}
 \end{center}
 \end{frame}
 
-\begin{frame}\frametitle{Introduction}
+\begin{frame}\frametitle{Bidding}
+    \begin{center}
+        \begin{itemize}
+            \item 6 possible choices for the model
+                \begin{itemize}
+                    \item Call Hearts
+                    \item Call Spades
+                    \item Call Clubs
+                    \item Call Diamonds
+                    \item Call Aces
+                    \item Pass
+                \end{itemize}
+            \item Hill-Climbing Algorithm for making the choice
+            \item Additional step for determining the call amount (+1, +2, etc.)
+        \end{itemize}
+    \end{center}
+\end{frame}
+
+\begin{frame}\frametitle{Bidding}
+    \begin{center}
+        Here is the general function for the algorithm
+        \begin{equation*}
+            f(x) = (round(Max(HeuristicSet)/20), Max(HeuristicSet).Suit)
+        \end{equation*}
+        \begin{equation*}
+                \left[(Spades.Heuristic, Spades), (Hearts.Heuristic, Hearts),\\
+                    (Clubs.Heuristic, Clubs) (Diamonds.Heuristic, Diamonds),\\
+                    (Aces.Heuristic, Aces), (Pass.Heuristic, Pass)\right]
+        \end{equation*}
+    \end{center}
+\end{frame}
+
+\begin{frame}\frametitle{Bidding}
     \begin{center}
     \begin{tikzpicture}[scale=0.65]
 
