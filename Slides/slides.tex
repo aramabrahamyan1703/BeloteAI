@@ -13,7 +13,7 @@
 \beamersetuncovermixins{\opaqueness<1>{25}}{\opaqueness<2->{15}}
 \begin{document}
 \title{Agent for Bazar Blot}
-\author{G. Hovhannisyan  A. Abrahamyan\\
+\author{G. Hovhannisyan,  A. Abrahamyan\\
 M. Khachatryan, M. Davtyan}
 \date{December 3, 2024}
 
@@ -83,7 +83,57 @@ M. Khachatryan, M. Davtyan}
 \end{center}
 \end{frame}
 
+\section{Introduction}
 \begin{frame}\frametitle{Introduction}
+    \begin{center}
+        \textbf{Environment Type}
+    \end{center}
+    \begin{itemize}
+        \item Partially Observable
+        \item Multi-Agent
+        \item Stochastic
+        \item Sequential
+        \item Static
+        \item Discrete
+        \item Known
+    \end{itemize}
+\end{frame}
+
+\section{Auction} 
+\begin{frame}\frametitle{Auction}
+    \begin{center}
+        \begin{itemize}
+            \item 6 possible choices for the model
+                \begin{itemize}
+                    \item Call Hearts
+                    \item Call Spades
+                    \item Call Clubs
+                    \item Call Diamonds
+                    \item Call No Trumps
+                    \item Pass
+                \end{itemize}
+            \item Hill-Climbing Algorithm for making the choice
+            \item Additional step for determining the call amount (+1, +2, etc.)
+        \end{itemize}
+    \end{center}
+\end{frame}
+
+\begin{frame}\frametitle{Auction}
+    Each of the possible calls have their own heuristic value and Hill Climbing algorithm will chose the max out of them.
+
+    \begin{itemize}
+    \item $f(Suit)$ = The values associated with the suit if it is chosen as trump + 1/2 $*$ The bid of the Friend of the same suit.
+    \item $f(NoTrmps)$ = (The values associated with the suit if it is chosen as trump + 1/2 $*$ The bid of the Friend of the same suit) / 2.
+    \item $f(Pass)$ = (Previous Highest Bid) $*$ 4.
+    \end{itemize}
+
+    The max will be chosen as the Suit and the value will be the max / 20.
+
+    
+
+\end{frame}
+
+\begin{frame}\frametitle{Auction}
     \begin{center}
     \begin{tikzpicture}[scale=0.65]
 
@@ -126,14 +176,14 @@ M. Khachatryan, M. Davtyan}
     \end{center}
 \end{frame}
 
-\section{Cheating Mini-Max}
-\begin{frame}\frametitle{Cheating Mini-Max}
+\section{Mini-Max}
+\begin{frame}\frametitle{Mini-Max}
     \begin{center}
-        \textbf{Cheating Mini-Max}
+        \textbf{Mini-Max}
     \end{center}
 \end{frame}
 
-\subsection{Expectimax}
+
 \begin{frame}\frametitle{Expectimax}
     Without resorting to cheating we will have $\binom{24}{8}$ nodes in our first depth!\\
     \begin{center}
@@ -187,14 +237,14 @@ M. Khachatryan, M. Davtyan}
     \end{center}        
 \end{frame}
 
-\subsection{Mini-Max}
-\begin{frame}\frametitle{Mini-Max}
+
+\begin{frame}\frametitle{Cheating Mini-Max}
     \begin{itemize}
         \item Assuming we know everyone's cards what's the approximate number of terminal states?
     \end{itemize}
 \end{frame}
 
-\begin{frame}\frametitle{Mini-Max}
+\begin{frame}\frametitle{Cheating Mini-Max}
         \begin{itemize}
             \item Assuming we know everyone's cards what's the approximate number of terminal states?
             \item $(8!)^4$
@@ -268,100 +318,17 @@ M. Khachatryan, M. Davtyan}
 \end{center}
 \end{frame}
 
-
-\section{Numerical Methods for Solving the SIR}
-\subsection{Euler's Method}
-
-\begin{frame}\frametitle{Numerical Solutions}
-\begin{itemize}
-\item Euler's Method
-\item Backward Euler's Method
-\end{itemize}
-\end{frame}
-
-\begin{frame}\frametitle{Euler's Method}
-    By using the extension $y'(x) \approx \frac{y_{k+1}-y_{k}}{h}$ and having the
-$y_0$, we can iteratively predict the $y_{k+1}=y(x+h)$, by using the system
-\vspace{1.5cm}
-\large
-\begin{equation*}
-    \begin{system}
-	    y_{k+1} = y_k + h\cdot f(x_k,y_k)
-        \\
-        y(x_0)=y_0
-    \end{system}
-\end{equation*}
-
-\end{frame}
-
-\begin{frame}\frametitle{Euler's Method}
-
-\end{frame}
-
-\begin{frame}\frametitle{Euler's Method}
-In case of SIR, we are solving 3 ODE's, hence we are solving a system
-for $s_{k+1}, i_{k+1}$, and $r_{k+1}$, given the $s_0, i_0, r_0$
-\vspace{0.7cm}
-\Large
-\[
-	\left\{
-		\begin{array}{l}
-			s_{k+1}=s_k - \beta \cdot h \cdot s_k \cdot i_k \\
-			i_{k+1}=i_k + (\beta \cdot s_k \cdot i_k - \gamma \cdot i_k) \cdot h \\
-			r_{k+1}=r_k+ \gamma \cdot h \cdot i_k
-		\end{array}
-	\right.
-\]
-\end{frame}
-
-\begin{frame}\frametitle{Backward Euler's Method}
-\subsection{Backward Euler's Method}
-This time, the Method uses a different approach, namely
-
-\begin{equation*}
-	y'(x) \approx \frac{y_k-y_{k+1}}{h}
-\end{equation*}
-
-Plugging the SIR ODE's, we will get the system
-
-    \begin{equation*}
-        \begin{system}
-        s_{t+1} = s_t - h \cdot \beta s_{t+1} i_{t+1}
-        \\
-        i_{t+1} = i_t + h \cdot (\beta s_{t+1} i_{t+1} - \gamma i_{t+1})
-        \\
-        r_{t+1}= r_t + h\cdot \gamma i_{t+1}
-        \end{system}
-    \end{equation*}
-    \vspace{0.3cm}
-\\
-    By solving each one of these SLE's, we will get the next approximations for $s_k,i_k,r_k$
-\end{frame}
-
-\begin{frame}\frametitle{Backward Euler's Method}
-
-\end{frame}
-
-\section{Simulation Results on Real-World Data}
-\begin{frame}\frametitle{Simulations}
+\section{Conclusion}
+\begin{frame}\frametitle{Conclusion}
     \begin{center}
-        \textbf{Simulations on USA's COVID-19 Data}
+        \textbf{How to make further improvements}
     \end{center}
-\end{frame}
-
-\subsection{Active Cases}
-\begin{frame}\frametitle{Active Cases}
-
-\end{frame}
-
-\subsection{Simulations on USA's COVID-19 Data}
-\begin{frame}\frametitle{Simulations on USA's COVID-19 Data}
-
-\end{frame}
-
-\subsection{Simulations on Armenia's COVID-19 Data}
-\begin{frame}\frametitle{Simulations on Armenia's COVID-19 Data}
-
+    \begin{itemize}
+        \item Use Learning Agents 
+        \item Monte-Carlo
+        \item Further Adjust the Heuristic Values 
+        \item Use Other Algorithms Instead of MiniMax
+    \end{itemize}
 \end{frame}
 
 \end{document}

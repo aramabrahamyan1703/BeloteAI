@@ -4,6 +4,7 @@ from Belote_Logic import *
 from players import *
 from auction import *
 from enum import Enum
+import keyboard
 from Final_Window import ScoreWindow
 import time
 import copy
@@ -18,7 +19,8 @@ curses.curs_set(0)
 OUR_FINAL_SCORE = 0
 THEIR_FINAL_SCORE = 0
 
-#The game is written with the state machine design pattern (mostly, hopefully)
+
+# The game is written with the state machine design pattern (mostly, hopefully)
 class GameState(Enum):
     DEALING = "Dealing"
     AUCTIONSUITS = "Auction Suits"
@@ -28,14 +30,15 @@ class GameState(Enum):
     PLAYINGCARD = "Playing Card"
     WAITINGFORCARD = "Waiting for card"
     ENDROUND = "Round Ended"
-    
-class PlayersManager(GameManager): # Inherits GameManager
-    def __init__(self, game: Cards): 
-        super().__init__(SCREEN_SIZE) 
-    
+
+
+class PlayersManager(GameManager):  # Inherits GameManager
+    def __init__(self, game: Cards):
+        super().__init__(SCREEN_SIZE)
+
     def setup_players_with_cards(self):
         Main_Cards.index = 0
-        self.main_cards: list[Main_Cards] = [] 
+        self.main_cards: list[Main_Cards] = []
         for card in self.cards[:8]:
             self.main_cards.append(Main_Cards(card, self.center, main_player=True, left_right=False))
 
@@ -43,7 +46,7 @@ class PlayersManager(GameManager): # Inherits GameManager
         self.left_bot_cards: list[Left_Cards] = []
         for card in self.cards[8:16]:
             self.left_bot_cards.append(Left_Cards(card, self.center, main_player=False, left_right=True))
-        
+
         Right_Cards.index = 0
         self.right_bot_cards: list[Right_Cards] = []
         for card in self.cards[16:24]:
@@ -53,84 +56,84 @@ class PlayersManager(GameManager): # Inherits GameManager
         self.top_bot_cards: list[Top_Cards] = []
         for card in self.cards[24:32]:
             self.top_bot_cards.append(Top_Cards(card, self.center, main_player=False, left_right=False))
-    
-    def setup(self): # This is called right before the first update call.
+
+    def setup(self):  # This is called right before the first update call.
         self.game = game
         self.game.create_deck()
         self.cards = game.deck
         self.center = (SCREEN_SIZE[0] // 2 + 4, SCREEN_SIZE[1] // 2 + 4)
         self.played_cards: list[Main_Cards | Left_Cards | Right_Cards | Top_Cards] = []
-        
+
         self.suits_prompt = Suits_Prompt((SCREEN_SIZE[0] // 2 - 25, SCREEN_SIZE[1] // 2 + 4))
         self.range_prompt = Range_Prompt((SCREEN_SIZE[0] // 2 - 25, SCREEN_SIZE[1] // 2 + 4))
-        
+
         self.speech_bubble = Speech_Bubble((SCREEN_SIZE[0] // 2, SCREEN_SIZE[1] // 2))
-        self.speech = None #The final decided upon speech bubble 
+        self.speech = None  # The final decided upon speech bubble
         self.speech_bubbles = []
         for _ in range(4):
             self.speech_bubbles.append(copy.deepcopy(self.speech_bubble))
-        
+
         self.main_game_starting_player: int = 0
-        
-        self.first_played_card_suit: int|None = None
-        
+
+        self.first_played_card_suit: int | None = None
+
         self.our_taken_cards: list[Main_Cards | Left_Cards | Right_Cards | Top_Cards] = []
         self.last_took = 0
-        
+
         self.final_window = ScoreWindow()
         self.final_timer = 0
-        
+
         self.game_state = GameState.DEALING.value
         self.start_time = time.time()
-        
+
         self.deal_start_time = time.time()
         self.winner_start_time = time.time()
         self.bot_auction_time = time.time()
-        
-        
+
         self.chosen_suit: list[int] = [None] * 5
         self.auction_start_num = 8
-        
+
         self.turn = 0
         self.noTrumps = False
         self.noTrumpsFinal = False
-        self.auction_result: list = [None, None, None, None] # KP (0 - no KP, 1 - KP), Suits, Value, Who Called(0 - Us, 1 - Them)
+        self.auction_result: list = [None, None, None,
+                                     None]  # KP (0 - no KP, 1 - KP), Suits, Value, Who Called(0 - Us, 1 - Them)
         self.auction_curr_num: list[int] = [self.auction_start_num] * 4
         self.auction_players_bids = [[], [], [], []]
         self.setup_players_with_cards()
 
-        self.set_title("Press q to quit") 
-        
+        self.set_title("Press q to quit")
+
         for card in self.main_cards:
-            self.add_object(card) 
-        
+            self.add_object(card)
+
         for card in self.left_bot_cards:
-            self.add_object(card) 
-        
+            self.add_object(card)
+
         for card in self.right_bot_cards:
-            self.add_object(card) 
-        
+            self.add_object(card)
+
         for card in self.top_bot_cards:
-            self.add_object(card) 
-                    
-    def update(self): #This is called every frame.
-        if Input.get_key_down('q'): 
-            self.quit() 
-            
+            self.add_object(card)
+
+    def update(self):  # This is called every frame.
+        if Input.get_key_down(12):  # q
+            self.quit()
+
         if self.game_state == GameState.DEALING.value:
-            if time.time() - self.start_time > 3: 
-                self.game_state = GameState.AUCTIONSUITS.value  
-        
+            if time.time() - self.start_time > 3:
+                self.game_state = GameState.AUCTIONSUITS.value
+
         if self.game_state == GameState.AUCTIONSUITS.value:
-            if not self.suits_prompt in self._GameManager__game_objects:  #Not a good way to do things but it is what it is
+            if not self.suits_prompt in self._GameManager__game_objects:  # Not a good way to do things but it is what it is
                 self.add_object(self.suits_prompt)
             self.auction_prompt_manager()
-            
+
         if self.game_state == GameState.AUCTIONNUMBER.value:
             self.auction_prompt_manager()
-            
+
         if self.game_state == GameState.BOTTURNAUCTION.value:
-            if time.time() - self.bot_auction_time > 1: 
+            if time.time() - self.bot_auction_time > 1:
                 self.bot_manager()
 
         if self.game_state == GameState.MAINGAME.value:
@@ -142,38 +145,38 @@ class PlayersManager(GameManager): # Inherits GameManager
                 self._GameManager__game_objects.remove(self.speech)
                 self.winner_start_time = time.time()
                 self.game_state = GameState.ENDROUND.value
-                return 
-            
+                return
+
             if self.turn == 0:
-                self.main_game_manager()        
+                self.main_game_manager()
             elif self.turn == 1 or self.turn == 3:
                 self.random_main_game_bot()
             else:
                 self.minimax_main_game_bot()
             pass
-        
+
         if self.game_state == GameState.ENDROUND.value:
             if time.time() - self.final_timer > 5:
                 self._GameManager__game_objects = []
                 flag = False
-                
+
                 global OUR_FINAL_SCORE
                 global THEIR_FINAL_SCORE
-                
+
                 if OUR_FINAL_SCORE > 300 and THEIR_FINAL_SCORE > 300:
                     flag = True
                     if OUR_FINAL_SCORE > THEIR_FINAL_SCORE:
                         self.final_window.set_winner(0)
                     else:
                         self.final_window.set_winner(1)
-                        
+
                 if OUR_FINAL_SCORE > 300 and THEIR_FINAL_SCORE <= 300:
                     self.final_window.set_winner(0)
                     flag = True
                 if THEIR_FINAL_SCORE > 300 and OUR_FINAL_SCORE <= 300:
                     self.final_window.set_winner(1)
                     flag = True
-                    
+
                 if flag:
                     self.add_object(self.final_window)
                     if time.time() - self.winner_start_time > 8:
@@ -184,24 +187,24 @@ class PlayersManager(GameManager): # Inherits GameManager
                 else:
                     self.setup()
                 return
-        
+
         if self.game_state == GameState.WAITINGFORCARD.value:
             self.clear_card_prompts(self.main_cards)
             if time.time() - self.deal_start_time > 1:
                 self.game_state = GameState.PLAYINGCARD.value
-        
+
         if self.game_state == GameState.PLAYINGCARD.value:
             self.change_turn_main_game()
-    
+
     def change_turn_main_game(self):
         self.turn = (self.turn + 1) % 4
-            
+
         if len(self.played_cards) == 4:
             cards = []
             for card in self.played_cards:
                 cards.append(card.card)
             who_took = game.who_takes(cards)
-            self.turn = (self.turn + who_took[0]) % 4 
+            self.turn = (self.turn + who_took[0]) % 4
             for card in self.played_cards:
                 card.end_turn(self.turn % 2)
                 if self.turn % 2 == 0:
@@ -210,7 +213,7 @@ class PlayersManager(GameManager): # Inherits GameManager
             self.last_took = self.turn % 2
             self.first_played_card_suit = None
         self.game_state = GameState.MAINGAME.value
-    
+
     def calculate_score(self):
         our_total_score = 10 if self.last_took == 0 else 0
         count = 0
@@ -218,10 +221,10 @@ class PlayersManager(GameManager): # Inherits GameManager
             count += 1
             our_total_score += game.get_card_value(card.card)
         their_total_score = 162 - our_total_score
-        
+
         global OUR_FINAL_SCORE
         global THEIR_FINAL_SCORE
-        
+
         if self.auction_result[2] > 16:
             if self.auction_result[3] == 0:
                 if count == 32:
@@ -237,25 +240,25 @@ class PlayersManager(GameManager): # Inherits GameManager
                 else:
                     OUR_FINAL_SCORE += self.auction_result[2] + 16
                     return [OUR_FINAL_SCORE, THEIR_FINAL_SCORE]
-                    
-        #We made the final auction
-        if self.auction_result[3] == 0:    
+
+        # We made the final auction
+        if self.auction_result[3] == 0:
             if our_total_score < self.auction_result[2] * 10:
                 THEIR_FINAL_SCORE += 16 + self.auction_result[2]
                 return [OUR_FINAL_SCORE, THEIR_FINAL_SCORE]
-            OUR_FINAL_SCORE += self.auction_result[2] + int((our_total_score / 10) + 0.4) 
-            THEIR_FINAL_SCORE += 16 - int((our_total_score / 10) + 0.4) 
+            OUR_FINAL_SCORE += self.auction_result[2] + int((our_total_score / 10) + 0.4)
+            THEIR_FINAL_SCORE += 16 - int((our_total_score / 10) + 0.4)
             return [OUR_FINAL_SCORE, THEIR_FINAL_SCORE]
-        
-        #They made the final auction
-        if self.auction_result[3] == 1:     
+
+        # They made the final auction
+        if self.auction_result[3] == 1:
             if their_total_score < self.auction_result[2] * 10:
                 OUR_FINAL_SCORE += 16 + self.auction_result[2]
                 return [OUR_FINAL_SCORE, THEIR_FINAL_SCORE]
-            THEIR_FINAL_SCORE += self.auction_result[2] + int((their_total_score / 10) + 0.4) 
-            OUR_FINAL_SCORE += 16 - int((their_total_score / 10) + 0.4) 
+            THEIR_FINAL_SCORE += self.auction_result[2] + int((their_total_score / 10) + 0.4)
+            OUR_FINAL_SCORE += 16 - int((their_total_score / 10) + 0.4)
             return [OUR_FINAL_SCORE, THEIR_FINAL_SCORE]
-                
+
     def random_main_game_bot(self):
         valid_cards = self.get_valid_cards(self.first_played_card_suit, self.turn)
         card = random.choice(valid_cards)
@@ -263,42 +266,41 @@ class PlayersManager(GameManager): # Inherits GameManager
             self.first_played_card_suit = card.card[1]
         self.play_card(card, self.turn)
         self.game_state = GameState.WAITINGFORCARD.value
-        
+
     def minimax_main_game_bot(self):
         card = self.get_player_cards(self.turn)[Alpha_Beta_Search(game, self)]
         if self.first_played_card_suit == None:
             self.first_played_card_suit = card.card[1]
         self.play_card(card, self.turn)
         self.game_state = GameState.WAITINGFORCARD.value
-            
+
     def clear_card_prompts(self, cards):
         for i in cards:
             i.remove_prompt()
-    
+
     def play_card(self, card: int, player):
         cards = []
-        
+
         cards = self.get_player_cards(player)
-        
+
         if player != 0:
             card.show_card()
-            
+
         card.to_play = True
         self.played_cards.append(card)
         if self.turn == 0:
             card.remove_prompt()
         cards.remove(card)
-        
+
         for i, card in enumerate(cards):
             card.arr_index = i
             card.index = i + ((8 - len(cards)) // 2)
             card.inplace = False
-        
 
         self.deal_start_time = time.time()
-          
+
     def get_player_cards(self, player) -> list:
-        #Could've been better, but were on a deadline and i have Gen-Ed classes to do.
+        # Could've been better, but were on a deadline and i have Gen-Ed classes to do.
         if player == 0:
             return self.main_cards
         if player == 1:
@@ -308,178 +310,180 @@ class PlayersManager(GameManager): # Inherits GameManager
         if player == 3:
             return self.right_bot_cards
         raise ValueError
-    
+
     def get_valid_cards(self, suit, player):
-        #This method uses so many if-s you might as well call it AI.
+        # This method uses so many if-s you might as well call it AI.
         cards = self.get_player_cards(player)
         valid_cards = []
         trump_cards_vals: list[int] = [11, 4, 3, 20, 10, 14, 0, 0]
-        
+
         if suit == None:
             return cards
-        
+
         if game.trump_suit == 4:
-            #If you have cards of the same suit
+            # If you have cards of the same suit
             for card_obj in cards:
                 if card_obj.card[1] == suit:
-                    valid_cards.append(card_obj)         
-                    
-            #If not, any card         
+                    valid_cards.append(card_obj)
+
+                    # If not, any card
             return valid_cards if valid_cards else cards
-        
-        
+
         temp = []
         for i in self.played_cards:
             temp.append(i.card)
-        
+
         who_takes = game.who_takes(temp)
-    
+
         if suit == game.trump_suit:
-            #If you have bigger trump
+            # If you have bigger trump
             max_val = 0
             for card_obj in self.played_cards:
                 if card_obj.card[1] == suit:
                     if max_val < trump_cards_vals[card_obj.card[0]]:
                         max_val = trump_cards_vals[card_obj.card[0]]
-                    
+
             for card_obj in cards:
                 if card_obj.card[1] == game.trump_suit and trump_cards_vals[card_obj.card[0]] > max_val:
                     valid_cards.append(card_obj)
-                    
-            #If not, If you have any trumps
+
+            # If not, If you have any trumps
             if not valid_cards:
                 for card_obj in cards:
                     if card_obj.card[1] == suit:
                         valid_cards.append(card_obj)
-            #If not, any card
+            # If not, any card
             return valid_cards if valid_cards else cards
-        
-        #Check if there is a trump
+
+        # Check if there is a trump
         trump_in_deck = False
         for card_obj in self.played_cards:
             if card_obj.card[1] == game.trump_suit:
                 trump_in_deck = True
                 break
-        
+
         if trump_in_deck:
-            #If you have cards of the same suit
+            # If you have cards of the same suit
             for card_obj in cards:
                 if card_obj.card[1] == suit:
                     valid_cards.append(card_obj)
-                     
-            #If not, If you have bigger trump cards
+
+            # If not, If you have bigger trump cards
             if not valid_cards:
-                
+
                 if len(self.played_cards) > 1:
                     if len(self.played_cards) - 2 == who_takes[0]:
                         return cards
-                    
+
                 max_val = 0
                 for card_obj in self.played_cards:
                     if card_obj.card[1] == suit:
                         if max_val < trump_cards_vals[card_obj.card[0]]:
-                            max_val = trump_cards_vals[card_obj.card[0]] 
-                
+                            max_val = trump_cards_vals[card_obj.card[0]]
+
                 for card_obj in cards:
                     if card_obj.card[1] == game.trump_suit and trump_cards_vals[card_obj.card[0]] > max_val:
                         valid_cards.append(card_obj)
-            
-            #If not, every card    
+
+            # If not, every card
             return valid_cards if valid_cards else cards
-                
-        
-        #If you have cards of the same suit
+
+        # If you have cards of the same suit
         for card_obj in cards:
             if card_obj.card[1] == suit:
-                valid_cards.append(card_obj)         
-        
-        #If not, if you have trump cards       
+                valid_cards.append(card_obj)
+
+                # If not, if you have trump cards
         if not valid_cards:
             if len(self.played_cards) > 1:
                 if len(self.played_cards) - 2 == who_takes[0]:
                     return cards
-                
+
             for card_obj in cards:
                 if card_obj.card[1] == game.trump_suit:
                     valid_cards.append(card_obj)
-                    
-        #If not, any card         
+
+        # If not, any card
         return valid_cards if valid_cards else cards
-        
+
     def main_game_manager(self):
+        keymap = {0: 18, 1: 19, 2: 20, 3: 21, 4: 23, 5: 22, 6: 26, 7: 28}
         valid_cards = self.get_valid_cards(self.first_played_card_suit, self.turn)
         for i, card in enumerate(valid_cards):
             if self.turn == 0:
                 card.show_prompt()
-            if Input.get_key_down(str(card.index + 1)):
+            if Input.get_key_down(keymap[card.index]):
                 if self.first_played_card_suit == None:
                     self.first_played_card_suit = valid_cards[i].card[1]
                 self.play_card(card, self.turn)
                 self.game_state = GameState.WAITINGFORCARD.value
-          
+
     def bot_manager(self):
         result = hill_climb_v2(manager)
         self.auction_players_bids[self.turn].append(result)
-        
+
         if result[0] != "Pass":
             self.auction_curr_num[self.turn] = self.auction_start_num + result[0]
         else:
             self.auction_curr_num[self.turn] = result[0]
-            
+
         self.bot_auction_time = time.time()
-        
+
         self.chosen_suit[self.turn] = result[1]
-        
-        self.auction_start_num = self.auction_curr_num[self.turn] + 1 if self.auction_curr_num[self.turn] != "Pass" else self.auction_start_num
+
+        self.auction_start_num = self.auction_curr_num[self.turn] + 1 if self.auction_curr_num[
+                                                                             self.turn] != "Pass" else self.auction_start_num
         suit_to_symbol = ["♡", '♤', '♧', '♢', 'A']
-        
+
         if self.auction_curr_num[self.turn] == "Pass":
             self.change_turn_auction(self.auction_curr_num[self.turn])
         else:
             if self.noTrumps:
                 self.auction_result = [1, self.chosen_suit[self.turn], self.auction_curr_num[self.turn], self.turn % 2]
-                self.change_turn_auction(f"{suit_to_symbol[self.chosen_suit[self.turn]]} {self.auction_curr_num[self.turn]} CP")
-                
+                self.change_turn_auction(
+                    f"{suit_to_symbol[self.chosen_suit[self.turn]]} {self.auction_curr_num[self.turn]} CP")
+
             else:
                 self.auction_result = [0, self.chosen_suit[self.turn], self.auction_curr_num[self.turn], self.turn % 2]
-                self.change_turn_auction(f"{suit_to_symbol[self.chosen_suit[self.turn]]} {self.auction_curr_num[self.turn]}")
-                
+                self.change_turn_auction(
+                    f"{suit_to_symbol[self.chosen_suit[self.turn]]} {self.auction_curr_num[self.turn]}")
+
     def change_turn_auction(self, text):
         if self.suits_prompt in self._GameManager__game_objects:
             self._GameManager__game_objects.remove(self.suits_prompt)
-            
+
         if self.range_prompt in self._GameManager__game_objects:
             self._GameManager__game_objects.remove(self.range_prompt)
-            
+
         if self.turn == 3:
-            self.game_state = GameState.AUCTIONSUITS.value  #FIRST IS A BOT
+            self.game_state = GameState.AUCTIONSUITS.value  # FIRST IS A BOT
         else:
             self.game_state = GameState.BOTTURNAUCTION.value
-        
+
         if self.speech_bubbles[self.turn] not in self._GameManager__game_objects:
             self.add_object(self.speech_bubbles[self.turn])
-            
+
         self.speech_bubbles[self.turn].set_text(text)
         self.speech_bubbles[self.turn].set_pos(self.turn)
-        
+
         self.turn = (self.turn + 1) % 4
-        
+
         for speech in self.speech_bubbles:
             if speech.text != "Pass":
                 return
-        
+
         if self.auction_result == [None, None, None, None]:
             self._GameManager__game_objects = []
             self.setup()
             return
-        
+
         for speech in self.speech_bubbles:
             if speech in self._GameManager__game_objects:
                 self._GameManager__game_objects.remove(speech)
         self.turn = (self.turn - 1) % 4
-        #SET TRUMP SUIT
+        # SET TRUMP SUIT
         self.speech = Speech_Bubble((SCREEN_SIZE[0] // 2, SCREEN_SIZE[1] // 2))
-        
+
         text = ""
         suit_to_symbol = ["♡", '♤', '♧', '♢', 'A']
         if self.auction_result[0] == 1:
@@ -489,81 +493,91 @@ class PlayersManager(GameManager): # Inherits GameManager
         self.speech.set_text(text)
         self.speech.set_pos(self.turn)
         self.add_object(self.speech)
-        
+
         self.game.trump_suit = self.auction_result[1]
         self.game_state = GameState.MAINGAME.value
-            
+
     def auction_prompt_manager(self):
         def change_promt(suit):
             self.chosen_suit[self.turn] = suit
             if self.suits_prompt in self._GameManager__game_objects:
                 self._GameManager__game_objects.remove(self.suits_prompt)
-            
+
             self.auction_curr_num[self.turn] = self.auction_start_num
-            self.range_prompt.set_num(f"{self.auction_curr_num[self.turn]} CP" if self.noTrumps else self.auction_curr_num[self.turn]) 
+            self.range_prompt.set_num(
+                f"{self.auction_curr_num[self.turn]} CP" if self.noTrumps else self.auction_curr_num[self.turn])
             self.add_object(self.range_prompt)
             self.game_state = GameState.AUCTIONNUMBER.value
-            
-        
+
         if self.game_state == GameState.AUCTIONSUITS.value:
-            if Input.get_key_down('1'):
+            if Input.get_key_down(18):
                 change_promt(0)
-            
-            if Input.get_key_down('2'):
+
+            if Input.get_key_down(19):
                 change_promt(1)
-            
-            if Input.get_key_down('3'):
+
+            if Input.get_key_down(20):
                 change_promt(2)
-            
-            if Input.get_key_down('4'):
+
+            if Input.get_key_down(21):
                 change_promt(3)
-            
-            if Input.get_key_down('n'):
+
+            if Input.get_key_down(23):
                 change_promt(4)
-            
-            if Input.get_key_down('p'):
+
+            if Input.get_key_down(35):  # p
                 self.change_turn_auction("Pass")
-        
+
         if self.game_state == GameState.AUCTIONNUMBER.value:
-            if Input.get_key_down('left arrow'):
-                self.auction_curr_num[self.turn] -= 1 if self.auction_curr_num[self.turn] > self.auction_start_num else 0
-                self.range_prompt.set_num(f"{self.auction_curr_num[self.turn]} CP" if self.noTrumps else self.auction_curr_num[self.turn])
-                
-            if Input.get_key_down('right arrow'):
-                self.auction_curr_num[self.turn] += 1 
-                self.range_prompt.set_num(f"{self.auction_curr_num[self.turn]} CP" if self.noTrumps else self.auction_curr_num[self.turn])
-                
-            if Input.get_key_down('c'):
+            if Input.get_key_down(123):  # 'left arrow'
+                self.auction_curr_num[self.turn] -= 1 if self.auction_curr_num[
+                                                             self.turn] > self.auction_start_num else 0
+                self.range_prompt.set_num(
+                    f"{self.auction_curr_num[self.turn]} CP" if self.noTrumps else self.auction_curr_num[self.turn])
+
+            if Input.get_key_down(124):  # 'right arrow'
+                self.auction_curr_num[self.turn] += 1
+                self.range_prompt.set_num(
+                    f"{self.auction_curr_num[self.turn]} CP" if self.noTrumps else self.auction_curr_num[self.turn])
+
+            if Input.get_key_down(8):  # c
                 if not self.noTrumpsFinal:
                     self.noTrumps = not self.noTrumps
-                    self.auction_curr_num[self.turn] = 25 if self.auction_start_num < 25 and self.noTrumps else self.auction_start_num
-                    self.range_prompt.set_num(f"{self.auction_curr_num[self.turn]} CP" if self.noTrumps else self.auction_curr_num[self.turn])
-                
-            if Input.get_key_down('esc'):
+                    self.auction_curr_num[
+                        self.turn] = 25 if self.auction_start_num < 25 and self.noTrumps else self.auction_start_num
+                    self.range_prompt.set_num(
+                        f"{self.auction_curr_num[self.turn]} CP" if self.noTrumps else self.auction_curr_num[self.turn])
+
+            if Input.get_key_down(53):  # esc
                 self.auction_curr_num[self.turn] = self.auction_start_num
                 if self.range_prompt in self._GameManager__game_objects:
                     self._GameManager__game_objects.remove(self.range_prompt)
                 self.game_state = GameState.AUCTIONSUITS.value
-                
-            if Input.get_key_down('p'):
+
+            if Input.get_key_down(35):  # p
                 self.change_turn_auction("Pass")
-                
-            if Input.get_key_down('d'):
-                #TODO: Implement double down logic
+
+            if Input.get_key_down(2):  # d
+                # TODO: Implement double down logic
                 pass
-            
-            if Input.get_key_down('enter'):
+
+            if Input.get_key_down(36):  # 'enter'
                 self.auction_start_num = self.auction_curr_num[self.turn] + 1
                 suit_to_symbol = ['♡', '♤', '♧', '♢', 'A']
                 if self.noTrumps:
-                    self.auction_result = [1,self.chosen_suit[self.turn],self.auction_curr_num[self.turn],self.turn % 2]
-                    self.change_turn_auction(f"{suit_to_symbol[self.chosen_suit[self.turn]]} {self.auction_curr_num[self.turn]} CP")
+                    self.auction_result = [1, self.chosen_suit[self.turn], self.auction_curr_num[self.turn],
+                                           self.turn % 2]
+                    self.change_turn_auction(
+                        f"{suit_to_symbol[self.chosen_suit[self.turn]]} {self.auction_curr_num[self.turn]} CP")
                 else:
-                    self.auction_result = [0,self.chosen_suit[self.turn],self.auction_curr_num[self.turn], self.turn % 2]
-                    self.change_turn_auction(f"{suit_to_symbol[self.chosen_suit[self.turn]]} {self.auction_curr_num[self.turn]}")
-                
+                    self.auction_result = [0, self.chosen_suit[self.turn], self.auction_curr_num[self.turn],
+                                           self.turn % 2]
+                    self.change_turn_auction(
+                        f"{suit_to_symbol[self.chosen_suit[self.turn]]} {self.auction_curr_num[self.turn]}")
+
                 if self.noTrumps:
                     self.noTrumpsFinal = True
+
 
 if __name__ == "__main__":
     game = Cards()
