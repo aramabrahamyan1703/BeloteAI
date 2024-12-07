@@ -23,14 +23,18 @@ The remaining cards are dealt after the bidding – a group of three for each pl
 In the Armenian \textit{``Bazar Blot''} version, each player gets a pack of 4 cards, then another equal pack, after which the bidding process starts.
 
 \subsection{Bidding}
+The bidding process starts with the player on the left of the dealer.
+The aim of this procedure is to decide the trump suit(contract) for the game and the overall score that the team suggesting the contract is going to get.
 The possible contracts for \textit{``Bazar Blot''} are:
 \begin{itemize}
     \item Clubs $\clubsuit$
-    \item Diamonds $\diamondsuit$
+    \item Diamond $\diamondsuit$
     \item Hearts $\heartsuit$
     \item Spades $\spadesuit$
     \item No Trumps
 \end{itemize}
+The trump suit is the ``strongest'' suit of the round, and in case one plays it, they can take any card on the table (in case if there is no higher trump card on the table).
+``No Trumps'' is different from the other contracts, and it means that during the game there will be no trumps and the every card will have their regular values, except the aces, which will become 19 in their value.
 Every player must either suggest a higher bid or:
 \begin{itemize}
     \item Pass
@@ -38,14 +42,15 @@ Every player must either suggest a higher bid or:
     \item Re-Double (Re-contra), if the other team have doubled bidder's or bidder partner's contract.
     \item Capot, meaning that team will win the round without giving any points to the opponents.
 \end{itemize}
-
+For instance, if the final contract has been made on ``Clubs 9'', then the team who has suggested that contract must score 90 or more in that round to win and get $9+(contract value)$ points, otherwise they will lose, and the opponent team will get $16+9$ points for that round.
 The bidding procedure is over when one of the following happens:
 \begin{itemize}
     \item Four \textit{passes} are announced.
-    \item A contract is \textit{Doubled} and (and not) \textit{Re-Doubled}
+    \item A contract is \textit{Doubled} and (and not) \textit{Re-Doubled} (The definitions of Double and Re-Double are given in the next section)
 \end{itemize}
-\subsection{Declarations}
+After the bidding process is over the actual playing part begins.
 
+\subsection{Declarations}
 \hspace{\parindent} The \textit{declarations} are special combinations of cards that need to be announced during the first trick and be shown to the rest of the players during the second trick to get bonus points for them.
 The exception is \textit{Belote/Re-Belote}, which is not being announced during the first trick, but the player needs to announce while playing either \textit{King} or \textit{Queen} of trump suit.
 If any of these rules are being broken the \textit{declarations} are being omitted.
@@ -97,13 +102,13 @@ If they do not have a card of the same suit, they must play a trump card.
 If they cannot play trump either, they can play any suit.
 If the first card played is trump, the subsequent players must follow the suit as well as play a trump card that beats all the cards on the table if they can.
 It is called \textit{``raising''} and applies only for trump suits.
-If they cannot play such card, they put any trump card.
+If they cannot play such a card, they put any trump card.
 In case they do not have any trump, they can play any suit.
-If non-trump card was played first, and then trump, the subsequent player must follow the suit of the first card, and does not have to put a higher trump; however, if the player on turn does not have a card that follows the suit of the first card, they have to put a higher trump.
+If a non-trump card was played first, and then trump, the subsequent player must follow the suit of the first card, and does not have to put a higher trump; however, if the player on turn does not have a card that follows the suit of the first card, they have to put a higher trump.
 If any of the above rules are being broken, the opponents get 162 points in addition to all \textit{``declarations''} declared in the round regardless of who has made the declaration and current round ends.
-When each player has played 1 card, the player whose card was the highes wins the \textit{``hand''} or \textit{``trick''} and collects the cards played in this trick and plays first in next hand/trick.
-
-
+When each player has played 1 card, the player whose card was the highes wins the \textit{``hand''} or \textit{``trick''} (A hand or a trick is a state when each of all 4 players have placed down a single card) and collects the cards played in this trick and plays first in next hand/trick.
+After 8 tricks have been played in total, and no one has any card remaining, the cards won on each trick for each team are being calculated and added to their respective scores.
+The rules for calculating the scores is discussed in the next section.
 \subsection{Scoring}
 \hspace{\parindent} Every team counts the points on the tricks they have won together.
 The winner of the last trick adds 10 to the overall points.\\
@@ -143,7 +148,7 @@ The opponent team gets $(16 - (\textit{the score of bidding team}))$ points.
 Otherwise, the opponent team gets 16 points in addition to the bid, and the bidding team is said to lose the round and gets no points.
 Special cases are \textit{Capot}, \textit{Contra/Re-contra}, and \textit{No-Trumps}.
 If the contract has been agreed to be \textit{No-Trumps}, the bid is being multiplied by 2 and summed to the overall points for the round for the winning team.
-If the team fails to get necessary points, the opposing team gets $(16 + 2 \times bid)$ points for the round.
+If the team fails to get the necessary points, the opposing team gets $(16 + 2 \times bid)$ points for the round.
 If any of the teams has done \textit{Capot} regardless the bid, they get $(25+bid)$ points.
 If the contract has been \textit{Doubled(Contra)}, the winning team gets $(2\times bid + 16)$ points.
 If the contract has been \textit{Doubled(Contra)} and \textit{Re-Doubled(Re-Contra)} the winning team gets $(4\times bid + 16)$ points.
@@ -156,6 +161,6 @@ Each team add the points retrieved from \textit{declarations} to the overall sco
     \item Stochastic (The deck is shuffled after each round)
     \item Sequential (Actions are interconnected over time)
     \item Static (No changes over time)
-    \item Discrete (Finite amount of actions)
+    \item Discrete (Finite number of actions)
     \item Known (Rules are fully known)
 \end{itemize}
