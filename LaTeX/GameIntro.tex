@@ -1,4 +1,4 @@
-\section{Bazar Blot Game}\label{GameIntro}\thispagestyle{SectionFirstPage} % Hide headers on the first page of the section
+\section{Introduction}\label{GameIntro}\thispagestyle{SectionFirstPage} % Hide headers on the first page of the section
 \lhead{Introduction to Bazar Blot}
 \subsection{The Origin of the Game}
 \hspace{\parindent} Belote is a 32-card game played primarily in France and in some other countries like Armenia, Belgium, Bulgaria, Croatia, Cyprus, and Georgia.
@@ -44,20 +44,6 @@ The bidding procedure is over when one of the following happens:
     \item Four \textit{passes} are announced.
     \item A contract is \textit{Doubled} and (and not) \textit{Re-Doubled}
 \end{itemize}
-
-\subsection{Playing}
-\hspace{\parindent} The dealer's successor(the player to the right of the dealer) plays their card first.
-The first player can play any card; however, the subsequent players must follow the suit if they can.
-If they do not have a card of the same suit, they must play a trump card.
-If they cannot play trump either, they can play any suit.
-If the first card played is trump, the subsequent players must follow the suit as well as play a trump card that beats all the cards on the table if they can.
-It is called \textit{``raising''} and applies only for trump suits.
-If they cannot play such card, they put any trump card.
-In case they do not have any trump, they can play any suit.
-If non-trump card was played first, and then trump, the subsequent player must follow the suit of the first card, and does not have to put a higher trump; however, if the player on turn does not have a card that follows the suit of the first card, they have to put a higher trump.
-If any of the above rules are being broken, the opponents get 162 points in addition to all \textit{``declarations''} declared in the round regardless of who has made the declaration and current round ends.
-When each player has played 1 card, the player whose card was the highes wins the \textit{``hand''} or \textit{``trick''} and collects the cards played in this trick and plays first in next hand/trick.
-
 \subsection{Declarations}
 
 \hspace{\parindent} The \textit{declarations} are special combinations of cards that need to be announced during the first trick and be shown to the rest of the players during the second trick to get bonus points for them.
@@ -104,6 +90,20 @@ In case if 2 opponents have the same combination, the one with a top rank of com
 \textit{E.g. Tierce(A,K,Q) $<$ Tierce(K,Q,J)}\\
 The only combination that cannot be voided is \textit{Belote/Re-Belote}
 
+\subsection{Playing}
+\hspace{\parindent} The dealer's successor(the player to the right of the dealer) plays their card first.
+The first player can play any card; however, the subsequent players must follow the suit if they can.
+If they do not have a card of the same suit, they must play a trump card.
+If they cannot play trump either, they can play any suit.
+If the first card played is trump, the subsequent players must follow the suit as well as play a trump card that beats all the cards on the table if they can.
+It is called \textit{``raising''} and applies only for trump suits.
+If they cannot play such card, they put any trump card.
+In case they do not have any trump, they can play any suit.
+If non-trump card was played first, and then trump, the subsequent player must follow the suit of the first card, and does not have to put a higher trump; however, if the player on turn does not have a card that follows the suit of the first card, they have to put a higher trump.
+If any of the above rules are being broken, the opponents get 162 points in addition to all \textit{``declarations''} declared in the round regardless of who has made the declaration and current round ends.
+When each player has played 1 card, the player whose card was the highes wins the \textit{``hand''} or \textit{``trick''} and collects the cards played in this trick and plays first in next hand/trick.
+
+
 \subsection{Scoring}
 \hspace{\parindent} Every team counts the points on the tricks they have won together.
 The winner of the last trick adds 10 to the overall points.\\
@@ -148,3 +148,14 @@ If any of the teams has done \textit{Capot} regardless the bid, they get $(25+bi
 If the contract has been \textit{Doubled(Contra)}, the winning team gets $(2\times bid + 16)$ points.
 If the contract has been \textit{Doubled(Contra)} and \textit{Re-Doubled(Re-Contra)} the winning team gets $(4\times bid + 16)$ points.
 Each team add the points retrieved from \textit{declarations} to the overall score.
+
+\subsection{Environment Type}
+\begin{itemize}
+    \item Partially Observable (Opponents' cards are not visible)
+    \item Multi-Agent (4 players)
+    \item Stochastic (The deck is shuffled after each round)
+    \item Sequential (Actions are interconnected over time)
+    \item Static (No changes over time)
+    \item Discrete (Finite amount of actions)
+    \item Known (Rules are fully known)
+\end{itemize}

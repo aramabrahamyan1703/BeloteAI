@@ -50,7 +50,7 @@
 \usepackage{algorithm} % For algorithms
 \usepackage{setspace} % To set line spacing locally
 \usepackage{graphicx} % Allow figures
-\graphicspath{ {images/} } % Specify the path for images
+\graphicspath{ {figures/} } % Specify the path for images
 \usepackage[dvipsnames]{xcolor} % Enable more colors in text
 \usepackage{microtype} % Improve justification
 \usepackage{url} % Line-breaking urls
@@ -119,7 +119,7 @@ Mikayel Davtyan
     \tableofcontents
 }
 
-% Abstract
+%Abstract
 \newpage
 \pagenumbering{roman}
 \begin{abstract}
@@ -127,8 +127,8 @@ Mikayel Davtyan
     The game Bazar Blot is a very popular game originating in France and making it's way into Armenia with heavy modifications.
     In this paper we will thoroughly explain the rules of the game, discuss how one might try to implement an agent for the game and show some examples of how we managed to do it.
     The game in itself is very complex involving enough rules to barely fit in 4-5 pages and requires a lot of effort to understand.
-    The agents for the game available now are generally accepted to be very bad at the game, while reading the paper we hope it will be apparent why that is the case.
-    In order to demonstrate the agents we also made the game using Python that entirely runs inside a terminal which is available in our GitHub page.
+    The agents for the game available now generally have poor performance, due to the lack of available research material.
+    In order to demonstrate the agents we also made the game using Python that entirely runs inside a terminal which is available in our \href{https://github.com/aramabrahamyan1703/BeloteAI}{GitHub Page}.
 \end{abstract}
 
 % Content
@@ -142,6 +142,9 @@ Mikayel Davtyan
 \include{GameIntro}
 
 \include{ModelDescription}
+\include{SimulationResults}
+\include{Conclusion}
+
 
 
 % Appendices, remove if unused

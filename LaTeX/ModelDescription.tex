@@ -1,4 +1,4 @@
-\section{Bazar Blot Game}\label{ModelDescription}
+\section{Methods}\label{ModelDescription}
 \lhead{AI algorithms used for the game}
 \subsection{Hill Climbing Algorithm for Bidding}
 \hspace{\parindent}You can find a provided template for the Belote AI model.
@@ -56,8 +56,8 @@ among the 5 possibilities, and compare it to the opponents’ bid.
 \end{tikzpicture} \pagebreak
 
 If at the start of the game you recalled 8 Spades, and the opponent (Left AI), raised the bid to 9 Clubs,
-your partner’s algorithm will look into the hand; say it has these cards (7$\diamondsuit$, 9$\spadesuit$, King$\spadesuit$,
-Jack$\heartsuit$, 9$\diamondsuit$, 8$\diamondsuit$, Ace$\clubsuit$, 10$\spadesuit$). The heuristic value for each of the suits would be;
+your partner's algorithm will look into the hand; say it has these cards (7$\diamondsuit$, 9$\spadesuit$, King$\spadesuit$,
+Jack$\heartsuit$, 9$\diamondsuit$, 8$\diamondsuit$, Ace$\clubsuit$, 10$\spadesuit$). The objective value for each of the suits would be;
 
 \begin{itemize}
     \item Diamonds:  14 = 0 (8$\diamondsuit$) + 14 (9$\diamondsuit$) + 0 (7$\diamondsuit$),
@@ -68,25 +68,25 @@ Jack$\heartsuit$, 9$\diamondsuit$, 8$\diamondsuit$, Ace$\clubsuit$, 10$\spadesui
 \end{itemize}
 
 Here it is obvious that the AI
-is going to call its partner’s bid (Spades, as it has the highest heuristic value), the question is: How much? There is another logic
+is going to call its partner's bid (Spades, as it has the highest objective value), the question is: How much? There is another logic
 imported that would decide if there is a need for the AI to increase the bid by 1, 2 or
 more, and the main logic is going to contain the possible additional points from special
-combinations (like Tierce giving 2 points), it will also include the bade suit heuristic
-value divided 20 (as each 10 heuristic equals to 1 point, and divided with another 2 for emergency)
+combinations (like Tierce giving 2 points), it will also include the bade suit objective
+value divided 20 (as each 10 objective equals to 1 point, and divided with another 2 for emergency)
 and rounded and will be added to the point
-count, in this case we will have a Tierce (7$\diamondsuit$, 8$\diamondsuit$, 9$\diamondsuit$) and heuristic difference of 32/20
-= 1.6, rounded to 2. The point count would include adding 4 points to the partner’s bid,
+count, in this case we will have a Tierce (7$\diamondsuit$, 8$\diamondsuit$, 9$\diamondsuit$) and objective difference of 32/20
+= 1.6, rounded to 2. The point count would include adding 4 points to the partner's bid,
 hence the algorithm will return 12 Spades. There are going to be extra conditions for
 the actions Coinchee, Cabot, etc.)
 
 
-\subsection{Minimax Algorithm for the Playing part}
-\hspace{\parindent} In the second part of the game one of the available options is stochastic Minimax.
+\subsection{Expectimax}
+\hspace{\parindent} In the second part of the game one of the available options is Expectimax.
 This algorithm consists of Min, Max and Chance nodes, the problem lies in the chance nodes which have a lot of nodes coming out of them.
 For example consider the first hand in the game when the bot has to make a move. Lets say the bot is a max node.
 The bot can make 8 moves so there are 8 branches coming out of the root. Next we need to have chance nodes coming out of each of the 8 nodes.
-The chance nodes each have $\binom{24}{8}$ nodes since that's how many possible combination of cards the next player can have.
-This by itself already renders the Minimax algorithm not practical since it is not feasible to check that many nodes.
+The chance nodes each have $\binom{24}{8}$ nodes since since there are 32 card and we know 8 of them we will have to take account for each possible hand the opponent can have which is $\binom{24}{8}$. 
+This by itself already renders the  Expectimax algorithm not practical since it is not feasible to check that many nodes.
 For example consider the case when there aer only 2 cards left for each player, and the first two moves for the play are made.
 
 \begin{tikzpicture}
@@ -130,7 +130,7 @@ A$\spadesuit$, A$\heartsuit$, 10$\diamondsuit$ and 8$\spadesuit$. The trumps are
 Here we have a situation, when we have 2 eligible moves, and we can risk our higher value 10$\spadesuit$ to gain the Q$\spadesuit$, but
 we also know that there is a risk that the Right AI has A$\spadesuit$, which will beat everyone, hence by using the 10$\spadesuit$ card,
 we will lose more points than if we use the K$\diamondsuit$. For making the best decision,
-our algorithm will use stochastic minimax algorithm, consider all possible combination of 4 remaining cards that our opponent can
+our algorithm will use Expectimax algorithm, consider all possible combination of 4 remaining cards that our opponent can
 possibly have, and return the best choice according to it. Here is the general process of the algorithm for this specific scenario.
 \pagebreak
 \begin{center}
@@ -205,7 +205,13 @@ child{node[max node,label=above right:{$K\diamondsuit$}]{\textcolor{black}{\text
 \end{tikzpicture}
 \end{center}
 
-Hence, according to the algorithm, the AI will pick A$\spadesuit$ for this play. This algorithm is going to
+Hence, according to the algorithm, the AI will pick 10$\spadesuit$ for this play. This algorithm is going to
 have issues if it is not intertwined with other plays as well, as it may use strong cards whenever it can, without trying to
 save them for a better occasion, and vice versa. However, it can be modified into a specific algorithm, that would
-use many aspects of stochastic minimax and have additional conditions for a better heuristic.
+use many aspects of stochastic minimax and have additional conditions for a better heuristic. 
+
+\subsection{Cheating Depth-Limited Minimax}
+One solution to our issue is to provide the opponent cards to the bot, which changes our environment type from Partially Observable to fully Observable and allows us to use standard MiniMax.
+However even with standard MiniMax we will have an upper bound of $(8!)^4 \approx 2*10^{18}$ possible terminal states since we have maximum of 8 moves that each player can make per trick and 4 cards in a trick.
+This as well is not computable in our testing even with alpha-beta pruning hence we decided to limit the depth to 4 and 12 and for non terminal nodes use the (Current Score) / 10 as a heuristic. 
+The current score refers to how many points was taken by a team up to that point. This gave us two algorithms which we tested against a random bot which chose cards randomly from available valid moves.
