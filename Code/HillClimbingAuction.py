@@ -50,7 +50,7 @@ def hill_climb_v1(manager):
     suit = costs[0][0]
     
 
-    if manager.auction_start_num * 4 > costs[0][1]:
+    if manager.auction_start_num * 3.5 > costs[0][1]:
         return ("Pass", 0)
     
     return (bid, suit) 

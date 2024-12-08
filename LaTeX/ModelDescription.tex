@@ -6,9 +6,12 @@ The general environment consists of a player and 3 AIs; let’s call them \texti
 AI}, \textit{Right AI} and \textit{Top AI}. The first stage of the game is the implementation of
 the bidding part, where each player should bid a number for the hand they received
 and try to negotiate with their partner. We decided to use the Hill-Climbing Algorithm by
-using a manual and mildly complicated heuristic for each player pair and each
-possible suit available to bid on (\textit{Spades, Hearts, Diamonds, Clubs, No-Trumps}). The
-Algorithm will count the heuristic value for each suit, compare it to the opponents’
+using a manual and mildly complicated cost function for each player pair and each
+possible suit available to bid on (\textit{Spades, Hearts, Diamonds, Clubs, No-Trumps}). The choice
+of this algorithm was due to dealing with a choice of 6 options, hence there is no need
+to make many extra moves, we only need to compare all available costs and choose the highest one.
+This logic seemed to be the closest to the Hill-Climbing algorithm.
+The Algorithm will count the cost for each suit, compare it to the opponents’
 bid, and take into account the partner’s previous bid. The main operation will include
 giving a weight to the higher cost cards (Aces and Tens for the Suit “Aces”, Jacks and
 Nines for the rest), add the partner’s bid to the corresponding suit, find the maximum
@@ -57,27 +60,30 @@ among the 5 possibilities, and compare it to the opponents’ bid.
 
 If at the start of the game you recalled 8 Spades, and the opponent (Left AI), raised the bid to 9 Clubs,
 your partner's algorithm will look into the hand; say it has these cards (7$\diamondsuit$, 9$\spadesuit$, King$\spadesuit$,
-Jack$\heartsuit$, 9$\diamondsuit$, 8$\diamondsuit$, Ace$\clubsuit$, 10$\spadesuit$). The objective value for each of the suits would be;
+Jack$\heartsuit$, 9$\diamondsuit$, 8$\diamondsuit$, Ace$\clubsuit$, 10$\spadesuit$). The objective value for each of the suits would be
+calculated by using the table of values, and 3 hyperparameters for giving weight to the Partner's bid (1.5), No Trumps value reduction (due to No Trumps generally
+having a higher value) (1.7), and for Pass value increase (as it is generally low) (4.5);
 
 \begin{itemize}
     \item Diamonds:  14 = 0 (8$\diamondsuit$) + 14 (9$\diamondsuit$) + 0 (7$\diamondsuit$),
-    \item Spades: 32 = 4 (King$\spadesuit$) + 14 (9$\spadesuit$) + 10 (1$\spadesuit$0) + 1/2 x 8 (Partner’s Bid),
+    \item Spades: 32 = 4 (King$\spadesuit$) + 14 (9$\spadesuit$) + 10 (1$\spadesuit$0) + 8 (Partner’s Bid) / 2,
     \item Hearts: 20 (Jack $\heartsuit$),
-    \item Clubs: 6.5 = 11 (Ace$\clubsuit$) - 1/2 x 9  (Opponents’ Bid),
-    \item No Trumps: 25 = 4 (King$\spadesuit$) + 19 (Ace$\clubsuit$) + 2 (Jack$\heartsuit$)
+    \item Clubs: 11 (Ace$\clubsuit$),
+    \item No Trumps: 12.5 = (4 (King$\spadesuit$) + 19 (Ace$\clubsuit$) + 2 (Jack$\heartsuit$)) / 2,
+    \item Pass: 31.5 = 3.5 * 9
 \end{itemize}
 
 Here it is obvious that the AI
 is going to call its partner's bid (Spades, as it has the highest objective value), the question is: How much? There is another logic
 imported that would decide if there is a need for the AI to increase the bid by 1, 2 or
-more, and the main logic is going to contain the possible additional points from special
-combinations (like Tierce giving 2 points), it will also include the bade suit objective
-value divided 20 (as each 10 objective equals to 1 point, and divided with another 2 for emergency)
+more, and the main logic is going to include the bade suit cost divided by 20 (as each 10 objective equals to 1 point, and divided with another 2 for emergency)
 and rounded and will be added to the point
-count, in this case we will have a Tierce (7$\diamondsuit$, 8$\diamondsuit$, 9$\diamondsuit$) and objective difference of 32/20
-= 1.6, rounded to 2. The point count would include adding 4 points to the partner's bid,
-hence the algorithm will return 12 Spades. There are going to be extra conditions for
-the actions Coinchee, Cabot, etc.)
+count, in this case we will have an objective difference of 32/20 = 1.6, rounded to 2. The point count would include adding 2 points to the partner's bid,
+hence the algorithm will return 10 Spades. The mode is not going to include the special combinations mentioned
+in the game description, such as "Tierce", "Fifty", etc, as well as there are going to be no options for "Coinchee" and "Cabot".
+Hence, only the potential value of the cards in the hand will be considered when making a bid.
+There is going to be set a minimum value for the initial bid and
+the raises can have any value, as it is allowed in the game. However, the agent will not be able to reduce the bid.
 
 
 \subsection{Expectimax}
@@ -132,7 +138,7 @@ we also know that there is a risk that the Right AI has A$\spadesuit$, which wil
 we will lose more points than if we use the K$\diamondsuit$. For making the best decision,
 our algorithm will use Expectimax algorithm, consider all possible combination of 4 remaining cards that our opponent can
 possibly have, and return the best choice according to it. Here is the general process of the algorithm for this specific scenario.
-\pagebreak
+
 \begin{center}
 \begin{tikzpicture}[scale=1.8,font=\footnotesize]
     \tikzset{
@@ -208,10 +214,10 @@ child{node[max node,label=above right:{$K\diamondsuit$}]{\textcolor{black}{\text
 Hence, according to the algorithm, the AI will pick 10$\spadesuit$ for this play. This algorithm is going to
 have issues if it is not intertwined with other plays as well, as it may use strong cards whenever it can, without trying to
 save them for a better occasion, and vice versa. However, it can be modified into a specific algorithm, that would
-use many aspects of stochastic minimax and have additional conditions for a better heuristic. 
+use many aspects of stochastic minimax and have additional conditions for a better cost.
 
 \subsection{Cheating Depth-Limited Minimax}
 One solution to our issue is to provide the opponent cards to the bot, which changes our environment type from Partially Observable to fully Observable and allows us to use standard MiniMax.
 However even with standard MiniMax we will have an upper bound of $(8!)^4 \approx 2*10^{18}$ possible terminal states since we have maximum of 8 moves that each player can make per trick and 4 cards in a trick.
-This as well is not computable in our testing even with alpha-beta pruning hence we decided to limit the depth to 4 and 12 and for non terminal nodes use the (Current Score) / 10 as a heuristic. 
+This as well is not computable in our testing even with alpha-beta pruning hence we decided to limit the depth to 4 and 12 and for non terminal nodes use the (Current Score) / 10 as a cost.
 The current score refers to how many points was taken by a team up to that point. This gave us two algorithms which we tested against a random bot which chose cards randomly from available valid moves.
