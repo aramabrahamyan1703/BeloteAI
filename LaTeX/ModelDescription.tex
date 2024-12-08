@@ -64,6 +64,19 @@ Jack$\heartsuit$, 9$\diamondsuit$, 8$\diamondsuit$, Ace$\clubsuit$, 10$\spadesui
 calculated by using the table of values, and 3 hyperparameters for giving weight to the Partner's bid (1.5), No Trumps value reduction (due to No Trumps generally
 having a higher value) (1.7), and for Pass value increase (as it is generally low) (4.5);
 
+\begin{frame}\frametitle{Auction}
+
+    \begin{itemize}
+    \item $f(Suit)$ = The values associated with the suit if it is chosen as trump + 1/2 $*$ The bid of the Friend of the same suit.
+    \item $f(NoTrumps)$ = (The values associated with the suit if it is chosen as trump + 1/2 $*$ The bid of the Friend of the same suit) / 2.
+    \item $f(Pass)$ = (Previous Highest Bid) $*$ 3.5.
+    \end{itemize}
+
+
+
+\end{frame}
+
+For our case, here are the 6 options we are left with after applying the cost function for each suit and pass
 \begin{itemize}
     \item Diamonds:  14 = 0 (8$\diamondsuit$) + 14 (9$\diamondsuit$) + 0 (7$\diamondsuit$),
     \item Spades: 32 = 4 (King$\spadesuit$) + 14 (9$\spadesuit$) + 10 (1$\spadesuit$0) + 8 (Partner’s Bid) / 2,
