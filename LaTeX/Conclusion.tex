@@ -1,2 +1,21 @@
 \section{Conclusion}\label{Conclusion}\thispagestyle{SectionFirstPage} % Hide headers on the first page of the section
-\lhead{Introduction to Bazar Blot}
+\lhead{Conclusion}
+\hspace{\parindent} In this paper,
+we discussed the complexities of the game Bazar Blot
+and suggested possible implementations of AI agents for this game.
+
+\hspace{\parindent} For the auction part, our suggestion was to use Hill Climbing algorithm, which works sufficiently fine; however, with further adjustments of cost values of bids can result in having a much better bidding agent.
+Furthermore, there many variations of Hill Climbing that can potentially be implemented and give a more consistent outcome.
+
+\hspace{\parindent} For the playing agents, we have discussed some variations of Expectimax algorithm.
+At the earliest stages of the game there are a lot of possible arrangements of cards; hence the width of the Expectimax tree at the first depth becomes $\binom{24}{8}$, which cannot be computed in real time, so we decided to use a Cheating MinMax algorithm to overcome this problem.
+The Cheating MinMax was able to perform better than the normal MinMax; however, in this case, the problem was with the depth of the tree.
+The agent required so much time to come up with a good option for that trick that the game lost its dynamism, which is a valuable part of this game.
+To resolve this issue, the decision was made to use a Depth-Limited Cheating MinMax algorith.
+The performance of this agent was below the expectations; however, it performed the best among all the implemented agents.
+The reason for that is that the Bazar Blot game itself does not rely on good performance in the early stages, rather than at the last stages.
+Playing optimal throughout the whole game is the only key to winning.
+Furthermore, in the majority of cases, there are such few eligible moves that even playing randomly gives a sufficiently good result, that is why in our analysis, the Depth-Limited Cheating MinMax agent performed almost at the same level as the Random agent in the version without an auction.
+
+\hspace{\parindent} To get a better result, one can further adjust the costs of the Hill Climbing algorithm, use learning agents, dive dipper into the MinMax algorithm, and find some tools to reduce the width of each level of the MinMax tree.
+There are some versions of this game where reinforcement learning is used, and those implementations give an incomparable better result than any other existing agent.
