@@ -1,8 +1,0 @@
-MACOS ARM Architecture
-step 1) install anaconda
-step 2) Run this in the terminal "conda config --env --set subdir osx-arm64" Changes the architecture of conda to X86.
-Step 3) Run "conda create --name myenv python=3.12"
-Step 4) Run "conda activate myenv"
-Step 4) Run "python -m pip install pyplayscii"
-Step 5) Run "python -m pip install numpy"
-Step 6) Run the main script.
