@@ -1,7 +1,7 @@
 # Agent for Bazar Blot
 The game Bazar Blot is a very popular game originating in France and making it’s way into Armenia with heavy modifications.
-In this repository you can find a [paper](https://duckduckgo.com) throughly explaining the rules, which are very complex and barelu fit in 4-5 pages requiring a lot of effort and experience to fully understand them.
-The agents for the game available now are generally accepted to be very bad at the game, while reading the [paper](https://duckduckgo.com) we hope it will be
+In this repository you can find a [paper](https://github.com/aramabrahamyan1703/BeloteAI/blob/main/Paper.pdf) throughly explaining the rules, which are very complex and barelu fit in 4-5 pages requiring a lot of effort and experience to fully understand them.
+The agents for the game available now are generally accepted to be very bad at the game, while reading the [paper](https://github.com/aramabrahamyan1703/BeloteAI/blob/main/Paper.pdf) we hope it will be
 apparent why that is the case. In order to demonstrate the agents we also made the
 game using Python that entirely runs inside a terminal which is available in this repository.
 ## Dependencies
